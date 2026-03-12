@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>סטארקווסט — פאנל ניהול</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --blue: #2D6BE4; --blue-dark: #1f52b8; --blue-light: #e8f0fd;
+  --gold: #F5C518; --gold-dark: #d4a900;
+  --navy: #1A1A2E; --navy-mid: #2a2a45;
+  --white: #fff; --bg: #f0f4ff;
+  --text: #1A1A2E; --text-soft: #6b7280;
+  --border: #e2e8f0;
+  --green: #16a34a; --green-bg: #f0fdf4;
+  --red: #dc2626;   --red-bg: #fff5f5;
+  --yellow: #ca8a04; --yellow-bg: #fefce8;
+  --radius: 12px;
+  --shadow: 0 2px 16px rgba(45,107,228,0.10);
+  --shadow-lg: 0 8px 40px rgba(45,107,228,0.16);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Heebo',sans-serif; background:var(--bg); color:var(--text); direction:rtl; min-height:100vh; }
+
+/* ── LOGIN ── */
+#login-screen {
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  background:var(--navy); position:relative; overflow:hidden;
+}
+#login-screen::before {
+  content:''; position:absolute; inset:0;
+  background: radial-gradient(circle at 20% 50%, rgba(245,197,24,0.06) 0%, transparent 60%),
+              radial-gradient(circle at 80% 30%, rgba(45,107,228,0.12) 0%, transparent 50%);
+}
+.login-card {
+  background:white; border-radius:20px; padding:40px; width:360px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.3); position:relative; z-index:1;
+  text-align:center;
+}
+.login-logo { font-size:32px; margin-bottom:6px; }
+.login-title { font-size:20px; font-weight:900; color:var(--navy); margin-bottom:4px; }
+.login-sub { font-size:13px; color:var(--text-soft); margin-bottom:28px; }
+.login-input {
+  width:100%; padding:12px 16px; border:2px solid var(--border); border-radius:10px;
+  font-family:'Heebo',sans-serif; font-size:16px; text-align:center; outline:none;
+  transition:all 0.2s; margin-bottom:14px; letter-spacing:3px;
+}
+.login-input:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(45,107,228,0.12); }
+.login-btn {
+  width:100%; padding:14px; background:var(--navy); color:white; border:none;
+  border-radius:10px; font-family:'Heebo',sans-serif; font-size:16px; font-weight:800;
+  cursor:pointer; transition:all 0.2s;
+}
+.login-btn:hover { background:var(--blue); }
+.login-err { color:var(--red); font-size:13px; font-weight:700; margin-top:10px; min-height:20px; }
+.login-hint { font-size:11px; color:var(--text-soft); margin-top:10px; }
+
+/* ── APP SHELL ── */
+#app { display:none; min-height:100vh; }
+
+.topbar {
+  background:var(--navy); color:white; padding:0 32px; height:60px;
+  display:flex; align-items:center; justify-content:space-between;
+  position:sticky; top:0; z-index:100; box-shadow:0 2px 12px rgba(0,0,0,0.2);
+}
+.topbar-logo { font-size:17px; font-weight:900; }
+.topbar-logo span { color:var(--gold); }
+.topbar-badge { background:rgba(245,197,24,0.2); border:1px solid rgba(245,197,24,0.4); color:var(--gold); font-size:12px; font-weight:800; padding:4px 12px; border-radius:100px; }
+.topbar-right { display:flex; align-items:center; gap:12px; }
+.logout-btn { background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:white; padding:7px 14px; border-radius:8px; font-family:'Heebo',sans-serif; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.2s; }
+.logout-btn:hover { background:rgba(255,255,255,0.2); }
+
+/* ── TABS ── */
+.tabs-bar { background:white; border-bottom:2px solid var(--border); padding:0 32px; display:flex; gap:0; }
+.tab-btn { padding:16px 24px; font-family:'Heebo',sans-serif; font-size:14px; font-weight:800; color:var(--text-soft); background:none; border:none; border-bottom:3px solid transparent; cursor:pointer; transition:all 0.15s; margin-bottom:-2px; }
+.tab-btn:hover { color:var(--blue); }
+.tab-btn.active { color:var(--blue); border-bottom-color:var(--blue); }
+
+/* ── MAIN ── */
+.main { max-width:1100px; margin:0 auto; padding:32px 24px; }
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+
+/* ── STAT CARDS ── */
+.stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+.stat-card { background:white; border-radius:var(--radius); padding:20px 24px; box-shadow:var(--shadow); border-right:4px solid var(--blue); }
+.stat-card.gold  { border-right-color:var(--gold); }
+.stat-card.green { border-right-color:var(--green); }
+.stat-card.red   { border-right-color:var(--red); }
+.stat-label { font-size:12px; font-weight:700; color:var(--text-soft); margin-bottom:8px; }
+.stat-value { font-size:30px; font-weight:900; color:var(--navy); line-height:1; }
+.stat-sub { font-size:12px; color:var(--text-soft); margin-top:6px; font-weight:600; }
+
+/* ── SECTION HEADER ── */
+.section-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.section-head h2 { font-size:18px; font-weight:900; color:var(--navy); }
+.section-head p  { font-size:13px; color:var(--text-soft); margin-top:2px; font-weight:500; }
+
+/* ── STUDENT TABLE ── */
+.table-wrap { background:white; border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+.table-toolbar { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; }
+.search-input { flex:1; padding:9px 14px; border:2px solid var(--border); border-radius:8px; font-family:'Heebo',sans-serif; font-size:14px; outline:none; transition:all 0.2s; max-width:280px; }
+.search-input:focus { border-color:var(--blue); }
+.filter-select { padding:9px 12px; border:2px solid var(--border); border-radius:8px; font-family:'Heebo',sans-serif; font-size:13px; font-weight:700; outline:none; color:var(--text); cursor:pointer; }
+.table-info { margin-right:auto; font-size:13px; color:var(--text-soft); font-weight:700; }
+
+table { width:100%; border-collapse:collapse; }
+thead tr { background:var(--navy); }
+thead th { padding:12px 16px; text-align:right; font-size:12px; font-weight:800; color:rgba(255,255,255,0.7); letter-spacing:0.03em; }
+tbody tr { border-bottom:1px solid var(--border); transition:background 0.1s; }
+tbody tr:last-child { border-bottom:none; }
+tbody tr:hover { background:#f8faff; }
+td { padding:13px 16px; font-size:14px; }
+.td-name { font-weight:800; color:var(--navy); display:flex; align-items:center; gap:10px; }
+.student-avatar { width:32px; height:32px; border-radius:50%; background:var(--blue); color:white; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:900; flex-shrink:0; }
+.stars-cell { display:flex; gap:2px; }
+.s { font-size:14px; filter:grayscale(1) opacity(0.25); }
+.s.on { filter:none; }
+.score-pill { display:inline-block; padding:3px 10px; border-radius:100px; font-size:12px; font-weight:800; }
+.score-pill.p { background:#dcfce7; color:#15803d; }
+.score-pill.g { background:var(--blue-light); color:var(--blue); }
+.score-pill.ok { background:#fef9c3; color:#a16207; }
+.score-pill.none { background:var(--bg); color:var(--text-soft); }
+.status-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-left:6px; }
+.status-dot.active  { background:var(--green); }
+.status-dot.warning { background:var(--yellow); }
+.status-dot.idle    { background:#cbd5e1; }
+.action-btns { display:flex; gap:6px; }
+.act-btn { padding:5px 12px; border-radius:6px; font-family:'Heebo',sans-serif; font-size:12px; font-weight:800; border:none; cursor:pointer; transition:all 0.15s; }
+.act-btn.view  { background:var(--blue-light); color:var(--blue); }
+.act-btn.view:hover  { background:var(--blue); color:white; }
+.act-btn.reset { background:var(--red-bg); color:var(--red); }
+.act-btn.reset:hover { background:var(--red); color:white; }
+
+/* ── PROGRESS BARS ── */
+.mini-bar-bg { width:80px; height:8px; background:var(--border); border-radius:100px; overflow:hidden; display:inline-block; vertical-align:middle; }
+.mini-bar-fill { height:100%; border-radius:100px; background:var(--blue); }
+
+/* ── CLASS STATS ── */
+.class-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.class-card { background:white; border-radius:var(--radius); padding:24px; box-shadow:var(--shadow); }
+.class-card h3 { font-size:15px; font-weight:900; color:var(--navy); margin-bottom:16px; }
+.topic-row { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+.topic-name { font-size:13px; font-weight:700; color:var(--text); min-width:110px; }
+.topic-bar-bg { flex:1; height:10px; background:var(--border); border-radius:100px; overflow:hidden; }
+.topic-bar-fill { height:100%; border-radius:100px; transition:width 0.8s cubic-bezier(0.34,1.56,0.64,1); }
+.topic-pct { font-size:12px; font-weight:800; color:var(--text-soft); min-width:36px; text-align:left; direction:ltr; }
+.at-risk-list { display:flex; flex-direction:column; gap:8px; }
+.at-risk-item { display:flex; align-items:center; gap:10px; padding:10px 14px; background:var(--red-bg); border-radius:8px; border-right:3px solid var(--red); }
+.at-risk-name { font-weight:800; font-size:14px; flex:1; }
+.at-risk-note { font-size:12px; color:var(--red); font-weight:700; }
+.top-students { display:flex; flex-direction:column; gap:8px; }
+.top-item { display:flex; align-items:center; gap:10px; padding:10px 14px; background:var(--green-bg); border-radius:8px; border-right:3px solid var(--green); }
+.top-rank { font-size:18px; }
+.top-name { font-weight:800; font-size:14px; flex:1; }
+.top-pts  { font-size:13px; font-weight:800; color:var(--green); }
+.dist-row { display:flex; gap:8px; margin-top:8px; }
+.dist-bar-col { flex:1; text-align:center; }
+.dist-bar-outer { height:80px; display:flex; align-items:flex-end; justify-content:center; margin-bottom:4px; }
+.dist-bar { width:36px; border-radius:6px 6px 0 0; transition:height 0.6s ease; }
+.dist-label { font-size:11px; font-weight:800; color:var(--text-soft); }
+.dist-count { font-size:13px; font-weight:900; color:var(--navy); }
+
+/* ── MODAL ── */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(26,26,46,0.6); z-index:200; align-items:center; justify-content:center; padding:20px; }
+.modal-overlay.show { display:flex; }
+.modal { background:white; border-radius:16px; padding:28px; max-width:480px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.3); animation:slideUp 0.25s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes slideUp { from{transform:translateY(30px);opacity:0;} to{transform:translateY(0);opacity:1;} }
+.modal h3 { font-size:18px; font-weight:900; color:var(--navy); margin-bottom:6px; }
+.modal-sub { font-size:13px; color:var(--text-soft); margin-bottom:20px; }
+.modal-section { margin-bottom:16px; }
+.modal-section h4 { font-size:13px; font-weight:800; color:var(--text-soft); margin-bottom:10px; text-transform:uppercase; letter-spacing:0.04em; }
+.topic-status-row { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:var(--bg); border-radius:8px; margin-bottom:6px; }
+.topic-status-name { font-size:14px; font-weight:700; }
+.topic-status-right { display:flex; align-items:center; gap:10px; }
+.modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
+.modal-btn { padding:10px 20px; border-radius:8px; font-family:'Heebo',sans-serif; font-size:14px; font-weight:800; border:none; cursor:pointer; transition:all 0.15s; }
+.modal-btn.primary { background:var(--blue); color:white; }
+.modal-btn.danger  { background:var(--red); color:white; }
+.modal-btn.cancel  { background:var(--bg); color:var(--text-soft); border:2px solid var(--border); }
+
+/* ── TOAST ── */
+.toast { position:fixed; bottom:24px; right:50%; transform:translateX(50%) translateY(80px); background:var(--navy); color:white; padding:11px 22px; border-radius:100px; font-size:13px; font-weight:800; z-index:9999; transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1); pointer-events:none; white-space:nowrap; }
+.toast.show { transform:translateX(50%) translateY(0); }
+
+/* ── SUPABASE BANNER ── */
+.info-banner { background:linear-gradient(135deg,var(--blue-light),#dbeafe); border:2px solid rgba(45,107,228,0.2); border-radius:12px; padding:16px 20px; margin-bottom:24px; display:flex; align-items:center; gap:14px; font-size:13px; font-weight:600; color:var(--navy); }
+.info-banner-icon { font-size:22px; flex-shrink:0; }
+
+@media(max-width:768px) {
+  .stats-row { grid-template-columns:1fr 1fr; }
+  .class-grid { grid-template-columns:1fr; }
+  .tabs-bar { padding:0 12px; overflow-x:auto; }
+  .main { padding:20px 12px; }
+  .topbar { padding:0 16px; }
+  table { font-size:12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LOGIN ══════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">🔐</div>
+    <div class="login-title">פאנל ניהול</div>
+    <div class="login-sub">סטארקווסט · גישת מנהל בלבד</div>
+    <input class="login-input" type="password" id="admin-pass" placeholder="סיסמה" autocomplete="off" />
+    <button class="login-btn" onclick="doAdminLogin()">כניסה</button>
+    <div class="login-err" id="login-err"></div>
+    <div class="login-hint">💡 רמז לדמו: admin123</div>
+  </div>
+</div>
+
+<!-- ══════════════ APP ══════════════ -->
+<div id="app">
+
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div class="topbar-logo">⭐ סטאר<span>קווסט</span></div>
+      <div class="topbar-badge">🔐 פאנל ניהול</div>
+    </div>
+    <div class="topbar-right">
+      <span style="font-size:13px;color:rgba(255,255,255,0.5);">כיתה ד׳2 · 2025–2026</span>
+      <button class="logout-btn" onclick="initApp()">🔄 רענן</button><button class="logout-btn" onclick="doLogout()">יציאה</button>
+    </div>
+  </div>
+
+  <div class="tabs-bar">
+    <button class="tab-btn active" onclick="switchTab('overview')" id="tab-overview">📊 סקירה כללית</button>
+    <button class="tab-btn" onclick="switchTab('students')" id="tab-students">👥 תלמידים</button>
+    <button class="tab-btn" onclick="switchTab('topics')" id="tab-topics">📐 נושאים</button>
+  </div>
+
+  <div class="main">
+
+    <!-- ── INFO BANNER ── -->
+    <div class="info-banner">
+      <span class="info-banner-icon">ℹ️</span>
+      <span>נתונים אמיתיים מ-Supabase — מתעדכנים בזמן אמת. לחץ רענן כדי לטעון מחדש.</span>
+    </div>
+
+    <!-- ══ TAB: OVERVIEW ══ -->
+    <div class="tab-panel active" id="panel-overview">
+
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">👥 תלמידים רשומים</div><div class="stat-value" id="st-total">28</div><div class="stat-sub">כיתה ד׳2</div></div>
+        <div class="stat-card gold"><div class="stat-label">⭐ ממוצע נקודות</div><div class="stat-value" id="st-avg-pts">312</div><div class="stat-sub">מתוך 100 אפשריים</div></div>
+        <div class="stat-card green"><div class="stat-label">✅ סיימו נושא 7</div><div class="stat-value" id="st-done">19</div><div class="stat-sub" id="st-done-pct">68% מהכיתה</div></div>
+        <div class="stat-card red"><div class="stat-label">⚠️ דורשים תשומת לב</div><div class="stat-value" id="st-atrisk">4</div><div class="stat-sub">ציון מתחת ל-60%</div></div>
+      </div>
+
+      <div class="class-grid">
+
+        <!-- Score distribution -->
+        <div class="class-card">
+          <h3>📊 התפלגות ציונים — נושא 7</h3>
+          <div class="dist-row" id="dist-chart"></div>
+        </div>
+
+        <!-- Topic completion -->
+        <div class="class-card">
+          <h3>📐 השלמת נושאים — פרק א׳</h3>
+          <div id="topic-completion"></div>
+        </div>
+
+        <!-- At risk -->
+        <div class="class-card">
+          <h3>⚠️ תלמידים שדורשים תשומת לב</h3>
+          <div class="at-risk-list" id="at-risk-list"></div>
+        </div>
+
+        <!-- Top students -->
+        <div class="class-card">
+          <h3>🏆 טופ 5 — שבוע זה</h3>
+          <div class="top-students" id="top-students"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ TAB: STUDENTS ══ -->
+    <div class="tab-panel" id="panel-students">
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <input class="search-input" type="text" placeholder="🔍 חפש תלמיד..." id="search-input" oninput="filterStudents()" />
+          <select class="filter-select" id="filter-status" onchange="filterStudents()">
+            <option value="all">כל הסטטוסים</option>
+            <option value="done">סיים נושא 7</option>
+            <option value="pending">לא סיים</option>
+            <option value="atrisk">דורש תשומת לב</option>
+          </select>
+          <select class="filter-select" id="filter-sort" onchange="filterStudents()">
+            <option value="name">מיון: שם</option>
+            <option value="score">מיון: ציון</option>
+            <option value="points">מיון: נקודות</option>
+          </select>
+          <span class="table-info" id="table-info">28 תלמידים</span>
+          <button class="act-btn view" onclick="exportCSV()">⬇️ ייצא CSV</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>שם</th>
+              <th>כיתה</th>
+              <th>נושא 7 — ציון</th>
+              <th>כוכבים</th>
+              <th>נקודות</th>
+              <th>ניסיונות</th>
+              <th>סטטוס</th>
+              <th>פעולות</th>
+            </tr>
+          </thead>
+          <tbody id="students-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ TAB: TOPICS ══ -->
+    <div class="tab-panel" id="panel-topics">
+      <div class="class-grid" style="grid-template-columns:1fr;">
+        <div class="class-card" style="max-width:100%;">
+          <h3>📐 סטטוס נושאים — פרק א׳ (7 נושאים)</h3>
+          <p style="font-size:13px;color:var(--text-soft);margin-bottom:20px;">רק נושא 7 פעיל כרגע. שאר הנושאים יפתחו בהמשך הפיתוח.</p>
+          <div id="topics-detail"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ STUDENT MODAL ══ -->
+<div class="modal-overlay" id="student-modal" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3 id="modal-student-name">—</h3>
+    <div class="modal-sub" id="modal-student-sub">—</div>
+    <div class="modal-section">
+      <h4>ביצועים לפי נושא</h4>
+      <div id="modal-topics"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeModal()">סגור</button>
+      <button class="modal-btn danger" id="modal-reset-btn" onclick="resetStudent()">🗑️ איפוס התקדמות</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONFIRM MODAL ══ -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3>⚠️ אישור איפוס</h3>
+    <div class="modal-sub" id="confirm-text">האם לאפס את ההתקדמות?</div>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="document.getElementById('confirm-modal').classList.remove('show')">ביטול</button>
+      <button class="modal-btn danger" id="confirm-ok-btn">כן, אפס</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+// SUPABASE
+// ══════════════════════════════════════════
+const SUPABASE_URL = 'https://xyvqlpzlgkyylvxdeiiy.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_BdIEzaevyWXQLBcl7gqMaQ_AvOAjBN_';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let students = []; // loaded from Supabase
+
+const TOPICS = [
+  { id:'noshe7', name:'נושא 7 — תכונות ה-0 וה-1', active:true  },
+  { id:'noshe6', name:'נושא 6 — סדר פעולות',        active:false },
+  { id:'noshe5', name:'נושא 5 — קשר כפל–חילוק',     active:false },
+  { id:'noshe4', name:'נושא 4 — חילוק בעשרות',       active:false },
+  { id:'noshe3', name:'נושא 3 — חילוק ב-10/100',     active:false },
+  { id:'noshe2', name:'נושא 2 — כפל בעשרות',         active:false },
+  { id:'noshe1', name:'נושא 1 — כפל ב-10/100',       active:false },
+];
+
+let activeStudentId = null;
+
+// ══════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════
+const ADMIN_PASS = 'admin123';
+
+function doAdminLogin() {
+  const val = document.getElementById('admin-pass').value;
+  if (val === ADMIN_PASS) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    initApp();
+  } else {
+    document.getElementById('login-err').textContent = '❌ סיסמה שגויה';
+    document.getElementById('admin-pass').value = '';
+  }
+}
+
+document.getElementById('admin-pass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doAdminLogin();
+});
+
+function doLogout() {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('admin-pass').value = '';
+  document.getElementById('login-err').textContent = '';
+}
+
+// ══════════════════════════════════════════
+// INIT — load from Supabase
+// ══════════════════════════════════════════
+async function initApp() {
+  showAdminLoading('טוען נתונים...');
+  try {
+    // Load all users + their progress
+    const { data: users, error } = await sb.from('users').select('*, progress(*)').order('name');
+    if (error) throw error;
+
+    students = (users || []).map((u, i) => {
+      const progRow = (u.progress || []).find(p => p.topic_id === 'noshe7');
+      return {
+        id: u.id,
+        idx: i + 1,
+        name: u.name,
+        cls: u.class,
+        avatar: u.name[0],
+        created_at: u.created_at,
+        progress: {
+          noshe7: progRow ? {
+            score: progRow.score,
+            stars: progRow.stars,
+            points: progRow.points,
+            tries: progRow.attempts
+          } : null
+        }
+      };
+    });
+
+    // Sort by score desc
+    students.sort((a,b) => (b.progress.noshe7?.score||0) - (a.progress.noshe7?.score||0));
+
+  } catch(e) {
+    console.error(e);
+    showToast('שגיאה בטעינת נתונים: ' + e.message);
+  }
+  hideAdminLoading();
+  renderOverview();
+  renderStudentsTable(students);
+  renderTopics();
+}
+
+function showAdminLoading(msg) {
+  let el = document.getElementById('admin-loading');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'admin-loading';
+    el.style.cssText = 'position:fixed;inset:0;background:rgba(26,26,46,0.5);z-index:9998;display:flex;align-items:center;justify-content:center;';
+    el.innerHTML = '<div style="background:white;border-radius:14px;padding:24px 36px;font-family:Heebo,sans-serif;font-size:16px;font-weight:800;color:#1A1A2E;">' + msg + '</div>';
+    document.body.appendChild(el);
+  } else {
+    el.style.display = 'flex';
+  }
+}
+function hideAdminLoading() {
+  const el = document.getElementById('admin-loading');
+  if (el) el.style.display = 'none';
+}
+
+// ══════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  document.getElementById('panel-'+name).classList.add('active');
+}
+
+// ══════════════════════════════════════════
+// OVERVIEW
+// ══════════════════════════════════════════
+function renderOverview() {
+  const done = students.filter(s => s.progress.noshe7?.stars > 0);
+  const atRisk = students.filter(s => {
+    const p = s.progress.noshe7;
+    return p && p.score < 60;
+  });
+  const avgPts = Math.round(done.reduce((a,s)=>a+(s.progress.noshe7?.points||0),0) / (done.length||1));
+
+  document.getElementById('st-total').textContent   = students.length;
+  document.getElementById('st-avg-pts').textContent = avgPts;
+  document.getElementById('st-done').textContent    = done.length;
+  document.getElementById('st-done-pct').textContent = Math.round(done.length/students.length*100) + '% מהכיתה';
+  document.getElementById('st-atrisk').textContent  = atRisk.length;
+
+  // Score distribution buckets: 0, <60, 60-79, 80-99, 100
+  const buckets = [
+    { label:'לא התחיל', color:'#cbd5e1', count: students.filter(s=>!s.progress.noshe7).length },
+    { label:'מתחת ל-60', color:getComputedStyle(document.documentElement).getPropertyValue('--red').trim()||'#dc2626', count: students.filter(s=>s.progress.noshe7&&s.progress.noshe7.score<60).length },
+    { label:'60–79',     color:'#f59e0b', count: students.filter(s=>s.progress.noshe7&&s.progress.noshe7.score>=60&&s.progress.noshe7.score<80).length },
+    { label:'80–99',     color:'#2D6BE4', count: students.filter(s=>s.progress.noshe7&&s.progress.noshe7.score>=80&&s.progress.noshe7.score<100).length },
+    { label:'100%',      color:'#16a34a', count: students.filter(s=>s.progress.noshe7&&s.progress.noshe7.score===100).length },
+  ];
+  const maxCount = Math.max(...buckets.map(b=>b.count), 1);
+  document.getElementById('dist-chart').innerHTML = buckets.map(b => `
+    <div class="dist-bar-col">
+      <div class="dist-bar-outer">
+        <div class="dist-bar" style="height:${Math.round(b.count/maxCount*72)+8}px;background:${b.color};"></div>
+      </div>
+      <div class="dist-count">${b.count}</div>
+      <div class="dist-label">${b.label}</div>
+    </div>
+  `).join('');
+
+  // Topic completion
+  const topicRows = TOPICS.map(t => {
+    const pct = t.active ? Math.round(done.length/students.length*100) : 0;
+    const color = pct>=80?'#16a34a':pct>=50?'#2D6BE4':'#f59e0b';
+    return `<div class="topic-row">
+      <span class="topic-name">${t.name.split('—')[0].trim()}</span>
+      <div class="topic-bar-bg"><div class="topic-bar-fill" style="width:${pct}%;background:${color};"></div></div>
+      <span class="topic-pct">${pct}%</span>
+    </div>`;
+  });
+  document.getElementById('topic-completion').innerHTML = topicRows.join('');
+
+  // At risk
+  document.getElementById('at-risk-list').innerHTML = atRisk.length
+    ? atRisk.slice(0,4).map(s => `
+      <div class="at-risk-item">
+        <div class="student-avatar" style="background:#fca5a5;color:#7f1d1d;">${s.avatar}</div>
+        <span class="at-risk-name">${s.name}</span>
+        <span class="at-risk-note">${s.progress.noshe7?.score||0}% · ${s.progress.noshe7?.tries||0} ניסיונות</span>
+        <button class="act-btn view" onclick="openStudentModal(${s.id})">צפה</button>
+      </div>`).join('')
+    : '<p style="color:var(--text-soft);font-size:13px;">אין תלמידים בסיכון כרגע 🎉</p>';
+
+  // Top 5
+  const top5 = [...students].sort((a,b)=>(b.progress.noshe7?.points||0)-(a.progress.noshe7?.points||0)).slice(0,5);
+  const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+  document.getElementById('top-students').innerHTML = top5.map((s,i) => `
+    <div class="top-item">
+      <span class="top-rank">${medals[i]}</span>
+      <div class="student-avatar">${s.avatar}</div>
+      <span class="top-name">${s.name}</span>
+      <span class="top-pts">${s.progress.noshe7?.points||0} נק׳</span>
+      <span style="font-size:13px;">${'⭐'.repeat(s.progress.noshe7?.stars||0)}</span>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════
+// STUDENTS TABLE
+// ══════════════════════════════════════════
+function renderStudentsTable(list) {
+  document.getElementById('table-info').textContent = list.length + ' תלמידים';
+  document.getElementById('students-tbody').innerHTML = list.map((s, idx) => {
+    const p = s.progress.noshe7;
+    const score  = p?.score || 0;
+    const stars  = p?.stars || 0;
+    const pts    = p?.points || 0;
+    const tries  = p?.tries || 0;
+    const hasDone = p && stars > 0;
+
+    const scorePill = !p
+      ? '<span class="score-pill none">לא התחיל</span>'
+      : score===100 ? `<span class="score-pill p">💎 ${score}%</span>`
+      : score>=80   ? `<span class="score-pill g">${score}%</span>`
+      : score>=60   ? `<span class="score-pill ok">${score}%</span>`
+      : `<span class="score-pill" style="background:#fef2f2;color:#dc2626;">${score}%</span>`;
+
+    const starsHtml = '<div class="stars-cell">' +
+      [1,2,3].map(i=>`<span class="s ${i<=stars?'on':''}">⭐</span>`).join('') + '</div>';
+
+    const barHtml = `<div class="mini-bar-bg"><div class="mini-bar-fill" style="width:${score}%;background:${score>=80?'#16a34a':score>=60?'#2D6BE4':'#f59e0b'};"></div></div>`;
+
+    const statusDot = !p ? 'idle' : score < 60 ? 'warning' : 'active';
+    const statusLabel = !p ? 'לא התחיל' : score < 60 ? 'דורש תשומת לב' : 'השלים';
+
+    return `<tr>
+      <td style="color:var(--text-soft);font-weight:700;">${idx+1}</td>
+      <td><div class="td-name"><div class="student-avatar">${s.avatar}</div>${s.name}</div></td>
+      <td style="color:var(--text-soft);">${s.cls}</td>
+      <td>${scorePill} ${barHtml}</td>
+      <td>${starsHtml}</td>
+      <td style="font-weight:800;color:var(--gold-dark);">${pts}</td>
+      <td style="color:var(--text-soft);">${tries || '—'}</td>
+      <td><span class="status-dot ${statusDot}"></span>${statusLabel}</td>
+      <td><div class="action-btns">
+        <button class="act-btn view" onclick="openStudentModal(${s.id})">צפה</button>
+        ${hasDone ? `<button class="act-btn reset" onclick="confirmReset(${s.id})">איפוס</button>` : ''}
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterStudents() {
+  const q      = document.getElementById('search-input').value.toLowerCase();
+  const status = document.getElementById('filter-status').value;
+  const sort   = document.getElementById('filter-sort').value;
+
+  let list = students.filter(s => {
+    if (q && !s.name.includes(q)) return false;
+    const p = s.progress.noshe7;
+    if (status === 'done')    return p && p.stars > 0;
+    if (status === 'pending') return !p || p.stars === 0;
+    if (status === 'atrisk')  return p && p.score < 60;
+    return true;
+  });
+
+  if (sort === 'score')  list = [...list].sort((a,b)=>(b.progress.noshe7?.score||0)-(a.progress.noshe7?.score||0));
+  if (sort === 'points') list = [...list].sort((a,b)=>(b.progress.noshe7?.points||0)-(a.progress.noshe7?.points||0));
+  if (sort === 'name')   list = [...list].sort((a,b)=>a.name.localeCompare(b.name,'he'));
+
+  renderStudentsTable(list);
+}
+
+// ══════════════════════════════════════════
+// TOPICS TAB
+// ══════════════════════════════════════════
+function renderTopics() {
+  const done = students.filter(s => s.progress.noshe7?.stars > 0);
+  document.getElementById('topics-detail').innerHTML = TOPICS.map((t, i) => {
+    const count = t.active ? done.length : 0;
+    const pct   = t.active ? Math.round(count/students.length*100) : 0;
+    const color = pct>=80?'#16a34a':pct>=50?'#2D6BE4':'#f59e0b';
+    const avgScore = t.active && done.length
+      ? Math.round(done.reduce((a,s)=>a+(s.progress.noshe7?.score||0),0)/done.length)
+      : 0;
+    return `
+      <div style="display:flex;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid var(--border);">
+        <div style="width:28px;height:28px;border-radius:50%;background:${t.active?'var(--blue)':'var(--border)'};color:${t.active?'white':'var(--text-soft)'};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;">${7-i}</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:800;color:var(--navy);margin-bottom:6px;">${t.name}</div>
+          <div class="topic-bar-bg" style="width:100%;max-width:400px;height:10px;">
+            <div class="topic-bar-fill" style="width:${pct}%;background:${color};"></div>
+          </div>
+        </div>
+        <div style="text-align:center;min-width:80px;">
+          <div style="font-size:18px;font-weight:900;color:var(--navy);">${count}/${students.length}</div>
+          <div style="font-size:11px;color:var(--text-soft);font-weight:700;">השלימו</div>
+        </div>
+        <div style="text-align:center;min-width:80px;">
+          ${t.active ? `<div style="font-size:18px;font-weight:900;color:${color};">${avgScore}%</div><div style="font-size:11px;color:var(--text-soft);font-weight:700;">ממוצע ציון</div>` : '<div style="font-size:13px;color:var(--text-soft);">🔒 לא פעיל</div>'}
+        </div>
+        <div>
+          ${t.active
+            ? '<span style="background:#dcfce7;color:#15803d;padding:4px 12px;border-radius:100px;font-size:12px;font-weight:800;">✅ פעיל</span>'
+            : '<span style="background:var(--bg);color:var(--text-soft);padding:4px 12px;border-radius:100px;font-size:12px;font-weight:800;">בקרוב</span>'}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════
+// STUDENT MODAL
+// ══════════════════════════════════════════
+function openStudentModal(id) {
+  const s = students.find(x => x.id === id);
+  if (!s) return;
+  activeStudentId = id;
+
+  document.getElementById('modal-student-name').textContent = s.name;
+  document.getElementById('modal-student-sub').textContent  = 'כיתה ' + s.cls + ' · תצוגת פירוט';
+
+  const p = s.progress.noshe7;
+  document.getElementById('modal-topics').innerHTML = TOPICS.map(t => {
+    const tp = t.id === 'noshe7' ? p : null;
+    const score  = tp?.score || 0;
+    const stars  = tp?.stars || 0;
+    const hasDone = tp && stars > 0;
+    const starsHtml = [1,2,3].map(i=>`<span style="font-size:16px;${i<=stars?'':'filter:grayscale(1) opacity(0.25)'}">⭐</span>`).join('');
+    return `<div class="topic-status-row">
+      <span class="topic-status-name">${t.name}</span>
+      <div class="topic-status-right">
+        ${hasDone ? `<span style="font-size:13px;font-weight:800;color:var(--blue);">${score}%</span>` : ''}
+        <div>${starsHtml}</div>
+        ${!t.active && t.id !== 'noshe7' ? '<span style="font-size:12px;color:var(--text-soft);">🔒</span>' : ''}
+        ${t.active && !hasDone ? '<span style="font-size:12px;color:var(--text-soft);">לא השלים</span>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('student-modal').classList.add('show');
+}
+
+function closeModal(e) {
+  if (!e || e.target.classList.contains('modal-overlay')) {
+    document.getElementById('student-modal').classList.remove('show');
+  }
+}
+
+function resetStudent() {
+  closeModal();
+  confirmReset(activeStudentId);
+}
+
+function confirmReset(id) {
+  const s = students.find(x => x.id === id);
+  if (!s) return;
+  document.getElementById('confirm-text').textContent = `לאפס את כל ההתקדמות של ${s.name}? (ציונים וכוכבים יימחקו)`;
+  document.getElementById('confirm-ok-btn').onclick = () => {
+    s.progress.noshe7 = null;
+    document.getElementById('confirm-modal').classList.remove('show');
+    renderStudentsTable(students.filter(() => true));
+    renderOverview();
+    showToast('✅ ההתקדמות של ' + s.name + ' אופסה');
+  };
+  document.getElementById('confirm-modal').classList.add('show');
+}
+
+// ══════════════════════════════════════════
+// EXPORT CSV
+// ══════════════════════════════════════════
+function exportCSV() {
+  const rows = [['שם','כיתה','ציון נושא 7','כוכבים','נקודות','ניסיונות']];
+  students.forEach(s => {
+    const p = s.progress.noshe7;
+    rows.push([s.name, s.cls, p?.score||0, p?.stars||0, p?.points||0, p?.tries||0]);
+  });
+  const csv = '\uFEFF' + rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'starquest-class-d2.csv';
+  a.click();
+  showToast('📥 הקובץ הורד בהצלחה');
+}
+
+// ══════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
