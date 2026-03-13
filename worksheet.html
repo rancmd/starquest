@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>סטארקווסט — דף עבודה</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="sq-styles.css">
+<style>
+.ws-main { max-width: 860px; margin: 0 auto; padding: 32px 24px 80px; }
+
+.ws-header {
+  background: white; border-radius: 20px; padding: 28px 32px; margin-bottom: 28px;
+  box-shadow: var(--shadow); border-top: 5px solid var(--blue);
+}
+.ws-meta-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.ws-badge { padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 800; background: var(--blue-light); color: var(--blue); }
+.ws-badge.chapter { background: #fef9c3; color: #a16207; }
+.ws-title-big { font-size: 24px; font-weight: 900; color: var(--navy); margin-bottom: 6px; }
+.ws-sub-text { font-size: 14px; color: var(--text-soft); font-weight: 500; }
+
+.progress-wrap {
+  background: white; border-radius: 14px; padding: 16px 24px; margin-bottom: 28px;
+  display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow);
+}
+.progress-label { font-size: 13px; font-weight: 800; color: var(--text-soft); white-space: nowrap; }
+.progress-bar-bg { flex: 1; height: 10px; background: var(--border); border-radius: 100px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--blue),#60a5fa); border-radius: 100px; transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1); width: 0%; }
+.progress-count { font-size: 14px; font-weight: 900; color: var(--navy); white-space: nowrap; }
+
+.section-card { background: white; border-radius: var(--radius); padding: 26px 28px; margin-bottom: 20px; box-shadow: var(--shadow); border: 2px solid transparent; }
+.section-title-row { display: flex; align-items: flex-start; margin-bottom: 20px; }
+.section-num-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 50%; background: var(--blue); color: white;
+  font-size: 13px; font-weight: 900; margin-left: 10px; flex-shrink: 0;
+}
+.section-title-text { font-size: 16px; font-weight: 700; color: var(--navy); line-height: 1.5; }
+.section-subtitle { font-size: 13px; color: var(--text-soft); margin-top: 4px; font-weight: 500; }
+.q-grid { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
+.q-box {
+  background: var(--bg); border-radius: 12px; padding: 16px 18px;
+  border: 2px solid var(--border); transition: all 0.2s; position: relative;
+}
+.q-box.correct { border-color: var(--success); background: var(--success-bg); }
+.q-box.wrong   { border-color: var(--error);   background: var(--error-bg); }
+.q-num-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 50%; background: var(--border);
+  color: var(--text-soft); font-size: 11px; font-weight: 900; margin-bottom: 10px;
+}
+.q-box.correct .q-num-badge { background: var(--success); color: white; }
+.q-box.wrong   .q-num-badge { background: var(--error);   color: white; }
+.fb-icon { position: absolute; top: 10px; left: 10px; font-size: 18px; display: none; }
+.q-box.correct .fb-icon, .q-box.wrong .fb-icon { display: block; }
+
+.expr { font-size: 20px; font-weight: 800; color: var(--navy); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; direction: ltr; justify-content: center; margin: 8px 0; }
+.answer-input {
+  width: 70px; height: 40px; border: 2px solid var(--blue); border-radius: 8px;
+  background: white; font-family: 'Heebo',sans-serif; font-size: 18px; font-weight: 800;
+  color: var(--navy); text-align: center; outline: none; transition: all 0.2s;
+}
+.answer-input:focus { border-color: var(--blue-dark); box-shadow: 0 0 0 3px rgba(45,107,228,0.15); }
+.answer-input:disabled { background: var(--bg); cursor: default; }
+.q-box.correct .answer-input { border-color: var(--success); background: var(--success-bg); color: var(--success); }
+.q-box.wrong   .answer-input { border-color: var(--error);   background: var(--error-bg);   color: var(--error); }
+
+.compare-row { display: flex; align-items: center; justify-content: center; gap: 10px; direction: ltr; }
+.compare-sides { font-size: 18px; font-weight: 800; color: var(--navy); white-space: nowrap; }
+.compare-input {
+  width: 52px; height: 40px; border: 2px solid var(--blue); border-radius: 8px;
+  background: white; font-family: 'Heebo',sans-serif; font-size: 20px; font-weight: 900;
+  color: var(--navy); text-align: center; outline: none; transition: all 0.2s;
+}
+.compare-input:focus { border-color: var(--blue-dark); box-shadow: 0 0 0 3px rgba(45,107,228,0.15); }
+.compare-input:disabled { background: var(--bg); cursor: default; }
+.q-box.correct .compare-input { border-color: var(--success); background: var(--success-bg); color: var(--success); }
+.q-box.wrong   .compare-input { border-color: var(--error);   background: var(--error-bg);   color: var(--error); }
+.correct-answer { font-size: 12px; color: var(--error); font-weight: 700; margin-top: 6px; text-align: center; display: none; direction: rtl; }
+.q-box.wrong .correct-answer { display: block; }
+
+.submit-wrap { text-align: center; padding: 32px 0 16px; }
+.btn-submit {
+  background: var(--gold); color: var(--navy); border: none; border-radius: 14px;
+  padding: 16px 48px; font-family: 'Heebo',sans-serif; font-size: 18px; font-weight: 900;
+  cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 20px rgba(245,197,24,0.4);
+}
+.btn-submit:hover { background: var(--gold-dark); transform: translateY(-2px); }
+.btn-submit:disabled { background: var(--border); color: var(--text-soft); cursor: default; box-shadow: none; transform: none; }
+
+.results-panel {
+  background: white; border-radius: 20px; padding: 36px; margin-top: 28px;
+  box-shadow: var(--shadow-lg); text-align: center; display: none;
+  border-top: 5px solid var(--gold);
+}
+.results-panel.show { display: block; }
+.results-emoji { font-size: 56px; margin-bottom: 16px; }
+.results-title { font-size: 26px; font-weight: 900; color: var(--navy); margin-bottom: 8px; }
+.results-sub   { font-size: 16px; color: var(--text-soft); margin-bottom: 20px; }
+.results-stars { display: flex; justify-content: center; gap: 10px; margin-bottom: 24px; }
+.results-star  { font-size: 40px; transition: all 0.3s; filter: grayscale(1) opacity(0.25); }
+.results-star.earned { filter: none; animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
+.results-star:nth-child(2) { animation-delay: 0.1s; }
+.results-star:nth-child(3) { animation-delay: 0.2s; }
+.results-stats { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; }
+.stat-pill { background: var(--bg); border-radius: 12px; padding: 16px 24px; text-align: center; border: 2px solid var(--border); min-width: 110px; }
+.stat-pill-val { font-size: 32px; font-weight: 900; color: var(--navy); line-height: 1; }
+.stat-pill-val.gold-v  { color: var(--gold-dark); }
+.stat-pill-val.green-v { color: var(--success); }
+.stat-pill-label { font-size: 12px; color: var(--text-soft); font-weight: 700; margin-top: 6px; }
+.results-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn-back-map {
+  background: var(--blue); color: white; border: none; border-radius: 12px;
+  padding: 14px 28px; font-family: 'Heebo',sans-serif; font-size: 16px; font-weight: 800;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-back-map:hover { background: var(--blue-dark); transform: translateY(-2px); }
+.btn-retry-ws {
+  background: var(--bg); color: var(--text-soft); border: 2px solid var(--border);
+  border-radius: 12px; padding: 14px 28px; font-family: 'Heebo',sans-serif;
+  font-size: 16px; font-weight: 800; cursor: pointer; transition: all 0.2s;
+}
+.btn-retry-ws:hover { border-color: var(--blue); color: var(--blue); }
+
+@media (max-width: 768px) {
+  .q-grid { grid-template-columns: 1fr; }
+  .ws-main { padding: 20px 14px 60px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="nav-logo">⭐ סטארקווסט</div>
+  <div class="nav-links">
+    <button class="nav-link" onclick="window.location.href='map.html'">🗺️ מפת שלבים</button>
+    <button class="nav-link" onclick="window.location.href='app.html'">🏠 בית</button>
+  </div>
+  <div class="nav-right">
+    <div class="nav-points" id="nav-points">⭐ 0 נק׳</div>
+    <div class="nav-avatar" id="nav-avatar">?</div>
+  </div>
+</nav>
+
+<div class="ws-main">
+  <div class="ws-header fadein">
+    <div class="ws-meta-row" id="ws-meta-row"></div>
+    <div class="ws-title-big" id="ws-title-big">טוען...</div>
+    <div class="ws-sub-text">מלא את כל התרגילים ולחץ "סיום" לראות את הציון שלך ⭐</div>
+  </div>
+  <div class="progress-wrap">
+    <span class="progress-label">התקדמות:</span>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="ws-progress-fill"></div></div>
+    <span class="progress-count" id="ws-progress-count">0 / 0</span>
+  </div>
+
+  <div id="ws-questions"></div>
+
+  <div class="submit-wrap">
+    <button class="btn-submit" id="ws-btn-submit" onclick="wsSubmit()">✅ סיום — בדוק את התשובות שלי</button>
+  </div>
+
+  <div class="results-panel" id="ws-results">
+    <div class="results-emoji" id="res-emoji">🌟</div>
+    <div class="results-title" id="res-title">כל הכבוד!</div>
+    <div class="results-sub"   id="res-sub">עבודה מצוינת</div>
+    <div class="results-stars">
+      <span class="results-star" id="rstar1">⭐</span>
+      <span class="results-star" id="rstar2">⭐</span>
+      <span class="results-star" id="rstar3">⭐</span>
+    </div>
+    <div class="results-stats">
+      <div class="stat-pill"><div class="stat-pill-val gold-v"  id="res-points">0</div><div class="stat-pill-label">נקודות הרווחת</div></div>
+      <div class="stat-pill"><div class="stat-pill-val green-v" id="res-correct">0</div><div class="stat-pill-label">תשובות נכונות</div></div>
+      <div class="stat-pill"><div class="stat-pill-val" id="res-pct">0%</div><div class="stat-pill-label">ציון</div></div>
+    </div>
+    <div class="results-actions">
+      <button class="btn-back-map" onclick="window.location.href='map.html'">🗺️ חזור למפת השלבים</button>
+      <button class="btn-retry-ws" onclick="wsRetry()">🔄 נסה שוב</button>
+    </div>
+  </div>
+
+  <div class="copyright">חומרי הלימוד © בעלי הזכויות המקוריים. מוצג לצרכי דמו בלבד. | סטארקווסט 2026</div>
+</div>
+
+<script src="sq-core.js"></script>
+<script>
+// ── Topic data ────────────────────────────────────────────
+// Each topic defines: id, title, chapter, badges[], sections[]
+// Each section: { title, subtitle, questions[] }
+// Each question: { id, type:'num'|'cmp'|'txt', left?, right?, expr?, answer }
+
+const TOPICS = {
+  noshe7: {
+    id:      'noshe7',
+    title:   'תכונות ה-0 וה-1',
+    chapter: 'פרק א׳',
+    ptsPerQ: 5,
+    sections: [
+      {
+        title: 'פתרו את התרגילים.',
+        subtitle: 'השלם את המספר החסר',
+        questions: [
+          { id:'q1', type:'num', expr: ['0 × 20 + 40 =', '__'], answer:'40' },
+          { id:'q2', type:'num', expr: ['0 × (20 + 40) =', '__'], answer:'0' },
+          { id:'q3', type:'num', expr: ['0 : 6 =', '__'], answer:'0' },
+          { id:'q4', type:'num', expr: ['0 : 300 =', '__'], answer:'0' },
+        ]
+      },
+      {
+        title: 'סמנו <, > או =',
+        subtitle: 'השווה בין הביטויים',
+        questions: [
+          { id:'q5', type:'cmp', left:'5,715 × 0', right:'5,715 + 0', answer:'<' },
+          { id:'q6', type:'cmp', left:'4,893 × 1', right:'4,893 + 1', answer:'<' },
+          { id:'q7', type:'cmp', left:'12,456 × 1', right:'12,456 + 0', answer:'=' },
+          { id:'q8', type:'cmp', left:'10,245 × 0', right:'1 × 10,245', answer:'<' },
+        ]
+      },
+      {
+        title: 'פתרו את התרגילים.',
+        subtitle: 'שימו לב — חילוק ב-0!',
+        questions: [
+          { id:'q9',  type:'num', expr: ['0 : 3,000 =', '__'], answer:'0' },
+          { id:'q10', type:'txt', expr: ['300 : 0 =', '__'], answer:'אי-אפשר', acceptAlso:['איאפשר','לאמוגדר','undefined','לא'] },
+          { id:'q11', type:'num', expr: ['3,000 : 1 =', '__'], answer:'3000' },
+          { id:'q12', type:'num', expr: ['300 × 0 =', '__'], answer:'0' },
+        ]
+      },
+      {
+        title: 'סמנו <, > או =',
+        subtitle: 'יש אפשרויות שונות — חשבו טוב!',
+        questions: [
+          { id:'q13', type:'cmp', left:'0 : 180',    right:'0 : 1,800', answer:'=' },
+          { id:'q14', type:'cmp', left:'0 : 5,000',  right:'0 + 500',   answer:'<' },
+          { id:'q15', type:'cmp', left:'0 × 2,000',  right:'0 : 200',   answer:'=' },
+          { id:'q16', type:'cmp', left:'300 − 0',    right:'0 : 3,000', answer:'>' },
+        ]
+      },
+      {
+        title: 'כתבו את המספר החסר.',
+        subtitle: 'שימו לב — יש אפשרויות שונות',
+        questions: [
+          { id:'q17', type:'num', expr: ['__', '× 6,008 = 6,008'],  answer:'1' },
+          { id:'q18', type:'num', expr: ['__', '+ 6,008 = 6,008'],  answer:'0' },
+          { id:'q19', type:'num', expr: ['__', ': 6,008 = 1'],      answer:'6008' },
+          { id:'q20', type:'num', expr: ['__', ': 6,008 = 0'],      answer:'0' },
+        ]
+      }
+    ]
+  }
+  // Add more topics here as needed:
+  // noshe6: { ... }
+};
+
+// ── State ─────────────────────────────────────────────────
+const session = requireAuth();
+const params  = new URLSearchParams(window.location.search);
+const topicId = params.get('topic') || 'noshe7';
+const topic   = TOPICS[topicId];
+let wsSubmitted = false;
+let allQuestions = []; // flat list of all questions in order
+
+// ── Render worksheet ──────────────────────────────────────
+function buildWorksheet() {
+  if (!topic) {
+    document.getElementById('ws-title-big').textContent = 'נושא לא נמצא';
+    return;
+  }
+
+  // Header
+  document.title = `סטארקווסט — ${topic.title}`;
+  document.getElementById('ws-title-big').textContent = topic.title;
+  document.getElementById('ws-meta-row').innerHTML = `
+    <span class="ws-badge chapter">${topic.chapter}</span>
+    <span class="ws-badge">חשבון</span>
+    <span class="ws-badge">${topic.id.replace('noshe','נושא ')}</span>`;
+
+  // Build questions HTML
+  const letters = 'אבגדהוזחטי'.split('');
+  let qIndex = 0;
+  let html = '';
+
+  topic.sections.forEach((sec, sIdx) => {
+    html += `<div class="section-card fadein">
+      <div class="section-title-row">
+        <span class="section-num-badge">${sIdx + 1}</span>
+        <div>
+          <div class="section-title-text">${sec.title}</div>
+          <div class="section-subtitle">${sec.subtitle}</div>
+        </div>
+      </div>
+      <div class="q-grid">`;
+
+    sec.questions.forEach(q => {
+      allQuestions.push(q);
+      const letter = letters[qIndex % letters.length];
+      qIndex++;
+
+      if (q.type === 'cmp') {
+        html += `
+          <div class="q-box" id="box-${q.id}">
+            <div class="q-num-badge">${letter}</div>
+            <div class="fb-icon" id="fb-${q.id}"></div>
+            <div class="compare-row">
+              <span class="compare-sides">${q.left}</span>
+              <input class="compare-input" id="inp-${q.id}" type="text" placeholder="?" maxlength="1" autocomplete="off">
+              <span class="compare-sides">${q.right}</span>
+            </div>
+            <div class="correct-answer" id="ca-${q.id}"></div>
+          </div>`;
+      } else {
+        // Build expression with input in place of '__'
+        const parts = q.expr.map(part =>
+          part === '__'
+            ? `<input class="answer-input" id="inp-${q.id}" type="${q.type === 'txt' ? 'text' : 'number'}" placeholder="?" autocomplete="off">`
+            : `<span>${part}</span>`
+        ).join('');
+        html += `
+          <div class="q-box" id="box-${q.id}">
+            <div class="q-num-badge">${letter}</div>
+            <div class="fb-icon" id="fb-${q.id}"></div>
+            <div class="expr">${parts}</div>
+            <div class="correct-answer" id="ca-${q.id}"></div>
+          </div>`;
+      }
+    });
+
+    html += '</div></div>';
+  });
+
+  document.getElementById('ws-questions').innerHTML = html;
+  const total = allQuestions.length;
+  document.getElementById('ws-progress-count').textContent = `0 / ${total}`;
+
+  // Attach input listeners
+  allQuestions.forEach(q => {
+    const el = document.getElementById('inp-' + q.id);
+    if (el) el.addEventListener('input', updateProgress);
+  });
+}
+
+function updateProgress() {
+  const filled = allQuestions.filter(q => {
+    const el = document.getElementById('inp-' + q.id);
+    return el && el.value.trim() !== '';
+  }).length;
+  const total = allQuestions.length;
+  const pct = Math.round((filled / total) * 100);
+  document.getElementById('ws-progress-fill').style.width = pct + '%';
+  document.getElementById('ws-progress-count').textContent = `${filled} / ${total}`;
+}
+
+function checkAnswer(q) {
+  const el = document.getElementById('inp-' + q.id);
+  if (!el) return false;
+  const user = el.value.trim().replace(/\s/g,'').replace(/,/g,'').toLowerCase();
+  const correct = q.answer.replace(/,/g,'').toLowerCase();
+  if (q.acceptAlso) {
+    return [correct, ...(q.acceptAlso || [])].some(a => user.includes(a.toLowerCase()));
+  }
+  return user === correct;
+}
+
+// ── Submit ────────────────────────────────────────────────
+async function wsSubmit() {
+  if (wsSubmitted) return;
+  wsSubmitted = true;
+  document.getElementById('ws-btn-submit').disabled = true;
+
+  let correctCount = 0;
+  allQuestions.forEach(q => {
+    const el  = document.getElementById('inp-' + q.id);
+    const box = document.getElementById('box-' + q.id);
+    const fb  = document.getElementById('fb-' + q.id);
+    const ca  = document.getElementById('ca-' + q.id);
+    if (el) el.disabled = true;
+    const ok = checkAnswer(q);
+    if (ok) {
+      box.classList.add('correct'); fb.textContent = '✅'; correctCount++;
+    } else {
+      box.classList.add('wrong'); fb.textContent = '❌';
+      ca.textContent = 'תשובה נכונה: ' + q.answer;
+    }
+  });
+
+  const total = allQuestions.length;
+  const score = Math.round((correctCount / total) * 100);
+  const pts   = correctCount * (topic.ptsPerQ || 5);
+  const stars = score >= 100 ? 3 : score >= 80 ? 2 : score >= 60 ? 1 : 0;
+
+  // ✅ FIXED: Save to Supabase (was broken before — used old localStorage system)
+  if (session) {
+    const saved = await saveProgress(session.id, topicId, { stars, score, points: pts });
+    if (saved) {
+      // Update session points
+      const progress = await loadProgress(session.id);
+      const { totalPoints } = computeTotals(progress);
+      session.points = totalPoints;
+      saveSession(session);
+      document.getElementById('nav-points').textContent = '⭐ ' + totalPoints + ' נק׳';
+    }
+  }
+
+  // Results panel
+  const panel = document.getElementById('ws-results');
+  panel.classList.add('show');
+  document.getElementById('res-correct').textContent = correctCount;
+  document.getElementById('res-points').textContent  = pts;
+  document.getElementById('res-pct').textContent     = score + '%';
+
+  // Stars animation
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById('rstar' + i);
+    el.classList.remove('earned');
+    if (i <= stars) setTimeout(() => el.classList.add('earned'), i * 200);
+  }
+
+  let emoji, title, sub;
+  if      (score === 100) { emoji='🏆'; title='מושלם! 100%!'; sub='ענקי! כל התשובות נכונות!'; }
+  else if (score >= 80)   { emoji='🌟'; title='כל הכבוד!';   sub='עבודה מצוינת!'; }
+  else if (score >= 60)   { emoji='👍'; title='יפה מאוד!';   sub='עוד קצת תרגול ותגיע ל-100%!'; }
+  else                    { emoji='💪'; title='ממשיכים להתאמן!'; sub='תעבור על החומר ותנסה שוב.'; }
+
+  document.getElementById('res-emoji').textContent = emoji;
+  document.getElementById('res-title').textContent = title;
+  document.getElementById('res-sub').textContent   = sub;
+
+  document.getElementById('ws-progress-fill').style.width = '100%';
+  document.getElementById('ws-progress-count').textContent = total + ' / ' + total;
+
+  setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
+  if (stars > 0) showToast('⭐ ' + ['','כוכב אחד','שני כוכבים','שלושה כוכבים!'][stars] + ' — שמור!');
+}
+
+function wsRetry() {
+  wsSubmitted = false;
+  document.getElementById('ws-btn-submit').disabled = false;
+  document.getElementById('ws-results').classList.remove('show');
+  document.getElementById('ws-progress-fill').style.width = '0%';
+  document.getElementById('ws-progress-count').textContent = '0 / ' + allQuestions.length;
+  allQuestions.forEach(q => {
+    const el  = document.getElementById('inp-' + q.id);
+    const box = document.getElementById('box-' + q.id);
+    const fb  = document.getElementById('fb-' + q.id);
+    const ca  = document.getElementById('ca-' + q.id);
+    if (el)  { el.value = ''; el.disabled = false; }
+    if (box) box.classList.remove('correct','wrong');
+    if (fb)  fb.textContent = '';
+    if (ca)  ca.textContent = '';
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Init ──────────────────────────────────────────────────
+document.getElementById('nav-avatar').textContent = session.name[0];
+document.getElementById('nav-points').textContent = '⭐ ' + (session.points || 0) + ' נק׳';
+buildWorksheet();
+</script>
+</body>
+</html>

@@ -6,325 +6,98 @@
 <title>סטארקווסט — למד. הרוויח. גדל.</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="sq-styles.css">
 <style>
-/* ===== GLOBAL ===== */
-:root {
-  --blue: #2D6BE4; --blue-dark: #1f52b8; --blue-light: #e8f0fd;
-  --gold: #F5C518; --gold-dark: #d4a900;
-  --navy: #1A1A2E; --navy-mid: #2a2a45;
-  --white: #ffffff; --bg: #f5f7ff;
-  --text: #1A1A2E; --text-soft: #6b7280;
-  --border: #e2e8f0;
-  --success: #16a34a; --success-bg: #f0fdf4;
-  --error: #dc2626; --error-bg: #fff5f5;
-  --locked: #94a3b8;
-  --radius: 14px;
-  --shadow: 0 4px 24px rgba(45,107,228,0.10);
-  --shadow-lg: 0 8px 40px rgba(45,107,228,0.18);
+/* ── Landing ─────────────────────────────────────────── */
+body.landing-page { background: var(--navy); }
+.stars-bg {
+  position: fixed; inset: 0; pointer-events: none;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(245,197,24,0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(45,107,228,0.15) 0%, transparent 50%);
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Heebo',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; direction:rtl; }
-
-/* ===== SCREEN SYSTEM ===== */
-.screen { display:none; min-height:100vh; }
-.screen.active { display:flex; flex-direction:column; }
-#screen-worksheet.active { display:block; }
-#screen-levelmap.active  { display:block; }
-
-/* ===== SHARED: TOPNAV ===== */
-.topnav {
-  background:var(--white); border-bottom:2px solid var(--border);
-  padding:0 32px; display:flex; align-items:center; justify-content:space-between;
-  height:64px; position:sticky; top:0; z-index:100;
-  box-shadow:0 2px 12px rgba(0,0,0,0.06);
+.star-dots {
+  position: fixed; inset: 0; pointer-events: none;
+  background-image:
+    radial-gradient(1.5px 1.5px at 10% 15%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 25% 40%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(2px 2px at 60% 10%, rgba(245,197,24,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 75% 55%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 85% 25%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(2px 2px at 90% 80%, rgba(245,197,24,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 15% 85%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 30% 90%, rgba(245,197,24,0.5) 0%, transparent 100%);
 }
-.nav-logo { font-size:20px; font-weight:800; color:var(--navy); }
-.nav-links { display:flex; gap:4px; }
-.nav-link {
-  padding:8px 16px; border-radius:10px; font-size:14px; font-weight:800;
-  color:var(--text-soft); cursor:pointer; border:none; background:none;
-  font-family:'Heebo',sans-serif; transition:all 0.15s;
+
+/* Page system */
+.page { display: none; }
+.page.active { display: block; }
+#page-landing.active { display: flex; flex-direction: column; min-height: 100vh; }
+
+.landing-nav {
+  position: relative; z-index: 10;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 24px 48px;
 }
-.nav-link:hover { background:var(--blue-light); color:var(--blue); }
-.nav-link.active { background:var(--blue-light); color:var(--blue); }
-.nav-right { display:flex; align-items:center; gap:12px; }
-.nav-points { background:var(--navy); color:var(--gold); padding:7px 16px; border-radius:100px; font-size:14px; font-weight:900; }
-.avatar { width:36px; height:36px; border-radius:50%; background:var(--blue); color:white; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:900; }
+.logo { font-size: 22px; font-weight: 900; color: white; }
+.logo span { color: var(--gold); }
 
-/* ===== SHARED: BUTTONS ===== */
-.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:13px 28px; border-radius:var(--radius); font-family:'Heebo',sans-serif; font-size:16px; font-weight:800; border:none; cursor:pointer; transition:all 0.2s; text-decoration:none; }
-.btn-primary { background:var(--gold); color:var(--navy); box-shadow:0 4px 20px rgba(245,197,24,0.35); }
-.btn-primary:hover { background:var(--gold-dark); transform:translateY(-2px); }
-.btn-blue { background:var(--blue); color:white; }
-.btn-blue:hover { background:var(--blue-dark); transform:translateY(-2px); }
-.btn-outline { background:transparent; border:2px solid rgba(255,255,255,0.3); color:white; }
-.btn-outline:hover { background:rgba(255,255,255,0.1); }
-.btn-full { width:100%; }
+.hero {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  flex-direction: column; text-align: center; padding: 60px 24px;
+  position: relative; z-index: 1;
+}
+.hero-badge {
+  display: inline-block;
+  background: rgba(245,197,24,0.15); border: 1px solid rgba(245,197,24,0.3);
+  color: var(--gold); font-size: 13px; font-weight: 800;
+  padding: 6px 18px; border-radius: 100px; margin-bottom: 24px;
+}
+.hero h1 {
+  font-size: clamp(36px, 6vw, 64px); font-weight: 900; color: white;
+  line-height: 1.1; margin-bottom: 20px;
+}
+.hero h1 span { color: var(--gold); }
+.hero-sub { font-size: 18px; color: rgba(255,255,255,0.65); max-width: 480px; line-height: 1.6; margin-bottom: 40px; }
+.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
 
-/* ===== TOAST ===== */
-.toast { position:fixed; bottom:28px; right:50%; transform:translateX(50%) translateY(80px); background:var(--navy); color:white; padding:12px 24px; border-radius:100px; font-size:14px; font-weight:800; z-index:9999; transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1); pointer-events:none; white-space:nowrap; }
-.toast.show { transform:translateX(50%) translateY(0); }
+.features {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  max-width: 700px; margin: 60px auto 0; padding: 0 24px;
+  position: relative; z-index: 1;
+}
+.feature-card {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px; padding: 24px; text-align: center;
+}
+.feature-icon { font-size: 32px; margin-bottom: 12px; }
+.feature-title { font-size: 15px; font-weight: 800; color: white; margin-bottom: 6px; }
+.feature-desc { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.5; }
+.landing-footer { text-align: center; padding: 32px; color: rgba(255,255,255,0.25); font-size: 12px; position: relative; z-index: 1; }
 
-/* ===== LANDING ===== */
-#screen-landing { background:var(--navy); position:relative; overflow:hidden; }
-.stars-bg { position:absolute; inset:0; background-image: radial-gradient(circle at 20% 30%, rgba(245,197,24,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(45,107,228,0.15) 0%, transparent 50%); pointer-events:none; }
-.star-dots { position:absolute; inset:0; pointer-events:none; background-image: radial-gradient(1.5px 1.5px at 10% 15%, rgba(255,255,255,0.6) 0%, transparent 100%), radial-gradient(1px 1px at 25% 40%, rgba(255,255,255,0.4) 0%, transparent 100%), radial-gradient(2px 2px at 60% 10%, rgba(245,197,24,0.8) 0%, transparent 100%), radial-gradient(1px 1px at 75% 55%, rgba(255,255,255,0.5) 0%, transparent 100%), radial-gradient(1.5px 1.5px at 85% 25%, rgba(255,255,255,0.4) 0%, transparent 100%), radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,0.3) 0%, transparent 100%), radial-gradient(2px 2px at 90% 80%, rgba(245,197,24,0.6) 0%, transparent 100%), radial-gradient(1px 1px at 15% 85%, rgba(255,255,255,0.4) 0%, transparent 100%), radial-gradient(1px 1px at 30% 90%, rgba(245,197,24,0.5) 0%, transparent 100%); }
-.landing-nav { position:relative; z-index:10; display:flex; align-items:center; justify-content:space-between; padding:24px 48px; }
-.logo { font-size:22px; font-weight:900; color:white; }
-.logo span { color:var(--gold); }
-.hero { flex:1; display:flex; align-items:center; justify-content:center; flex-direction:column; text-align:center; padding:60px 24px; position:relative; z-index:1; }
-.hero-badge { display:inline-block; background:rgba(245,197,24,0.15); border:1px solid rgba(245,197,24,0.3); color:var(--gold); font-size:13px; font-weight:800; padding:6px 18px; border-radius:100px; margin-bottom:24px; }
-.hero h1 { font-size:clamp(36px,6vw,64px); font-weight:900; color:white; line-height:1.1; margin-bottom:20px; }
-.hero h1 span { color:var(--gold); }
-.hero-sub { font-size:18px; color:rgba(255,255,255,0.65); max-width:480px; line-height:1.6; margin-bottom:40px; }
-.hero-actions { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
-.features { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; max-width:700px; margin:60px auto 0; padding:0 24px; position:relative; z-index:1; }
-.feature-card { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:24px; text-align:center; }
-.feature-icon { font-size:32px; margin-bottom:12px; }
-.feature-title { font-size:15px; font-weight:800; color:white; margin-bottom:6px; }
-.feature-desc { font-size:13px; color:rgba(255,255,255,0.5); line-height:1.5; }
-.landing-footer { text-align:center; padding:32px; color:rgba(255,255,255,0.25); font-size:12px; position:relative; z-index:1; }
+/* Auth pages override */
+#page-signup, #page-login { min-height: 100vh; display: none; align-items: center; justify-content: center; background: var(--bg); }
+#page-signup.active, #page-login.active { display: flex; }
 
-/* ===== AUTH ===== */
-#screen-signup, #screen-login { align-items:center; justify-content:center; background:var(--bg); }
-.auth-card { background:white; border-radius:20px; padding:40px; width:100%; max-width:420px; box-shadow:var(--shadow-lg); margin:24px; }
-.auth-logo { text-align:center; font-size:22px; font-weight:900; color:var(--navy); margin-bottom:8px; }
-.auth-title { font-size:22px; font-weight:900; color:var(--navy); margin-bottom:6px; text-align:center; }
-.auth-sub { font-size:14px; color:var(--text-soft); text-align:center; margin-bottom:28px; }
-.form-group { margin-bottom:18px; }
-.form-label { display:block; font-size:13px; font-weight:800; color:var(--navy); margin-bottom:7px; }
-.form-input, .form-select { width:100%; padding:12px 14px; border:2px solid var(--border); border-radius:10px; font-family:'Heebo',sans-serif; font-size:15px; color:var(--text); outline:none; transition:all 0.2s; background:white; }
-.form-input:focus, .form-select:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(45,107,228,0.12); }
-.form-error { font-size:12px; color:var(--error); font-weight:700; margin-top:5px; display:none; }
-.divider { text-align:center; color:var(--text-soft); font-size:13px; font-weight:700; margin:18px 0; position:relative; }
-.divider::before, .divider::after { content:''; position:absolute; top:50%; width:42%; height:1px; background:var(--border); }
-.divider::before { right:0; } .divider::after { left:0; }
-.auth-switch { text-align:center; font-size:13px; color:var(--text-soft); margin-top:14px; }
-.auth-switch a { color:var(--blue); font-weight:800; cursor:pointer; }
-
-/* ===== DASHBOARD ===== */
-#screen-dashboard { background:var(--bg); }
-.dash-content { flex:1; max-width:1000px; margin:0 auto; padding:32px 24px; width:100%; }
-.dash-section { display:none; }
-.dash-section.active { display:block; }
-.section-title { font-size:22px; font-weight:900; color:var(--navy); margin-bottom:6px; }
-.section-sub { font-size:14px; color:var(--text-soft); margin-bottom:24px; font-weight:500; }
-.stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:32px; }
-.stat-card { background:white; border-radius:var(--radius); padding:20px; box-shadow:var(--shadow); text-align:center; }
-.stat-label { font-size:12px; font-weight:800; color:var(--text-soft); margin-bottom:8px; }
-.stat-value { font-size:28px; font-weight:900; color:var(--navy); }
-.stat-value.gold { color:var(--gold-dark); }
-.stat-value.blue { color:var(--blue); }
-.stat-sub { font-size:11px; color:var(--text-soft); margin-top:4px; font-weight:600; }
-.worksheets-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
-.worksheet-card { background:white; border-radius:var(--radius); padding:20px; box-shadow:var(--shadow); cursor:pointer; border:2px solid transparent; transition:all 0.2s; }
-.worksheet-card:hover { border-color:var(--blue); transform:translateY(-3px); box-shadow:var(--shadow-lg); }
-.ws-subject { font-size:11px; font-weight:800; padding:3px 10px; border-radius:100px; margin-bottom:10px; display:inline-block; }
-.ws-subject.math { background:#e8f0fd; color:var(--blue); }
-.ws-subject.english { background:#f0fdf4; color:#15803d; }
-.ws-subject.science { background:#fef9c3; color:#a16207; }
-.ws-title { font-size:15px; font-weight:800; color:var(--navy); margin-bottom:6px; line-height:1.3; }
-.ws-meta { display:flex; align-items:center; justify-content:space-between; margin-top:12px; }
-.ws-points { font-size:13px; font-weight:800; color:var(--gold-dark); }
-.subject-filter { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
-.filter-btn { padding:8px 16px; border-radius:100px; font-family:'Heebo',sans-serif; font-size:13px; font-weight:800; border:2px solid var(--border); background:white; cursor:pointer; transition:all 0.2s; color:var(--text-soft); }
-.filter-btn.active { background:var(--blue); color:white; border-color:var(--blue); }
-.leaderboard-table { background:white; border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); }
-.lb-row { display:grid; grid-template-columns:60px 1fr 100px 60px; align-items:center; padding:14px 20px; border-bottom:1px solid var(--border); }
-.lb-row.header { background:var(--navy); color:white; font-size:13px; font-weight:800; }
-.lb-row.top-1 { background:linear-gradient(135deg,#fffbeb,white); }
-.lb-row.top-2 { background:linear-gradient(135deg,#f8fafc,white); }
-.lb-row.top-3 { background:linear-gradient(135deg,#fff7ed,white); }
-.lb-row.me { border:2px solid var(--blue); border-radius:8px; }
-.lb-rank { font-size:20px; }
-.lb-name { display:flex; align-items:center; gap:10px; font-weight:700; }
-.lb-avatar { width:32px; height:32px; border-radius:50%; background:var(--border); color:var(--text-soft); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:900; }
-.lb-points { font-size:18px; font-weight:900; color:var(--navy); }
-.lb-badge { font-size:20px; text-align:center; }
-.profile-top { display:flex; gap:24px; background:white; border-radius:var(--radius); padding:28px; box-shadow:var(--shadow); margin-bottom:28px; align-items:center; }
-.profile-avatar { width:80px; height:80px; border-radius:50%; background:var(--blue); color:white; display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:900; flex-shrink:0; }
-.profile-info h2 { font-size:22px; font-weight:900; color:var(--navy); margin-bottom:4px; }
-.profile-info p { color:var(--text-soft); font-size:14px; font-weight:600; }
-.badges-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
-.badge-card { background:white; border-radius:var(--radius); padding:20px; text-align:center; box-shadow:var(--shadow); opacity:0.4; }
-.badge-card.earned { opacity:1; border:2px solid var(--gold); }
-.badge-icon { font-size:32px; margin-bottom:8px; }
-.badge-name { font-size:14px; font-weight:800; color:var(--navy); margin-bottom:4px; }
-.badge-pts { font-size:12px; color:var(--text-soft); font-weight:600; }
-
-/* ===== LEVEL MAP SCREEN ===== */
-#screen-levelmap { background:var(--bg); }
-.lm-main { max-width:900px; margin:0 auto; padding:36px 24px 80px; }
-.chapter-header { background:linear-gradient(135deg,var(--navy) 0%,#2a2a55 100%); border-radius:20px; padding:28px 32px; margin-bottom:28px; display:flex; align-items:center; justify-content:space-between; box-shadow:var(--shadow-lg); position:relative; overflow:hidden; }
-.chapter-header::before { content:''; position:absolute; inset:0; background-image: radial-gradient(circle at 10% 50%, rgba(245,197,24,0.08) 0%, transparent 60%), radial-gradient(circle at 90% 20%, rgba(45,107,228,0.15) 0%, transparent 50%); pointer-events:none; }
-.chapter-info { position:relative; z-index:1; }
-.chapter-badge { display:inline-block; background:rgba(245,197,24,0.2); border:1px solid rgba(245,197,24,0.4); color:var(--gold); font-size:12px; font-weight:800; padding:4px 12px; border-radius:100px; margin-bottom:10px; }
-.chapter-title { font-size:20px; font-weight:900; color:white; margin-bottom:6px; }
-.chapter-sub { font-size:14px; color:rgba(255,255,255,0.6); font-weight:500; }
-.chapter-progress-wrap { position:relative; z-index:1; text-align:center; }
-.chapter-ring { width:80px; height:80px; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative; }
-.chapter-ring::before { content:''; position:absolute; inset:8px; border-radius:50%; background:var(--navy); }
-.chapter-ring-inner { position:relative; z-index:1; font-size:18px; font-weight:900; color:var(--gold); line-height:1; }
-.chapter-ring-label { font-size:11px; color:rgba(255,255,255,0.5); margin-top:8px; font-weight:700; }
-.stars-banner { background:white; border-radius:var(--radius); padding:16px 24px; margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; box-shadow:var(--shadow); border:2px solid var(--border); }
-.stars-banner-left { display:flex; align-items:center; gap:12px; }
-.stars-total { font-size:26px; font-weight:900; color:var(--gold-dark); }
-.connector { width:3px; height:40px; margin:0 auto; position:relative; z-index:0; transition:background 0.4s; background:var(--border); }
-.connector.done { background:linear-gradient(180deg,var(--gold),var(--gold-dark)); }
-.connector.active { background:linear-gradient(180deg,var(--blue),var(--blue-light)); }
-.level-row { display:flex; align-items:center; gap:16px; }
-.level-node { width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; border:3px solid var(--border); background:white; transition:all 0.2s; position:relative; z-index:1; }
-.level-node.done { background:var(--gold); border-color:var(--gold-dark); box-shadow:0 0 0 4px rgba(245,197,24,0.2); }
-.level-node.active { background:var(--blue); border-color:var(--blue-dark); box-shadow:0 0 0 6px rgba(45,107,228,0.2); animation:pulse 2s infinite; }
-.level-node.locked { background:#f1f5f9; border-color:#cbd5e1; }
-@keyframes pulse { 0%,100%{box-shadow:0 0 0 4px rgba(45,107,228,0.2);} 50%{box-shadow:0 0 0 10px rgba(45,107,228,0.08);} }
-.level-card { flex:1; background:white; border-radius:var(--radius); padding:18px 22px; border:2px solid var(--border); cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:space-between; box-shadow:var(--shadow); position:relative; overflow:hidden; }
-.level-card:hover:not(.locked-card) { border-color:var(--blue); transform:translateX(-3px); box-shadow:var(--shadow-lg); }
-.level-card.done-card { border-color:rgba(245,197,24,0.4); background:linear-gradient(135deg,#fffbeb,white); }
-.level-card.active-card { border-color:var(--blue); background:linear-gradient(135deg,var(--blue-light),white); }
-.level-card.locked-card { opacity:0.55; cursor:default; }
-.level-card-left { display:flex; flex-direction:column; gap:5px; }
-.level-num { font-size:11px; font-weight:800; color:var(--text-soft); }
-.level-title { font-size:16px; font-weight:900; color:var(--navy); line-height:1.3; }
-.level-meta { display:flex; align-items:center; gap:10px; font-size:12px; color:var(--text-soft); font-weight:600; margin-top:2px; }
-.level-meta-dot { width:3px; height:3px; border-radius:50%; background:var(--border); }
-.level-card-right { display:flex; flex-direction:column; align-items:flex-end; gap:8px; flex-shrink:0; }
-.stars-row { display:flex; gap:3px; direction:ltr; }
-.star-icon { font-size:20px; filter:grayscale(1) opacity(0.3); }
-.star-icon.earned { filter:none; }
-.score-badge { font-size:11px; font-weight:800; padding:3px 10px; border-radius:100px; }
-.score-badge.perfect { background:#dcfce7; color:#15803d; }
-.score-badge.good    { background:var(--blue-light); color:var(--blue); }
-.score-badge.pass    { background:#fef9c3; color:#a16207; }
-.level-btn { padding:7px 16px; border-radius:100px; font-family:'Heebo',sans-serif; font-size:12px; font-weight:800; border:none; cursor:pointer; transition:all 0.2s; }
-.level-btn.btn-start  { background:var(--blue); color:white; }
-.level-btn.btn-start:hover { background:var(--blue-dark); }
-.level-btn.btn-retry  { background:rgba(245,197,24,0.15); color:var(--gold-dark); border:1px solid rgba(245,197,24,0.4); }
-.level-btn.btn-retry:hover { background:rgba(245,197,24,0.25); }
-.level-btn.btn-locked { background:#f1f5f9; color:#94a3b8; cursor:default; }
-.chapter-locked { background:#f8fafc; border-radius:14px; border:2px dashed #cbd5e1; padding:24px; text-align:center; margin-top:32px; color:var(--locked); font-weight:700; font-size:14px; }
-
-/* Level modal */
-.lm-modal-overlay { display:none; position:fixed; inset:0; background:rgba(26,26,46,0.7); z-index:200; align-items:center; justify-content:center; padding:24px; }
-.lm-modal-overlay.show { display:flex; }
-.lm-modal { background:white; border-radius:20px; padding:32px; max-width:420px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.3); text-align:center; animation:slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1); }
-@keyframes slideUp { from{transform:translateY(40px);opacity:0;} to{transform:translateY(0);opacity:1;} }
-.lm-modal-emoji { font-size:52px; margin-bottom:12px; }
-.lm-modal-title { font-size:22px; font-weight:900; color:var(--navy); margin-bottom:6px; }
-.lm-modal-sub { font-size:14px; color:var(--text-soft); margin-bottom:20px; }
-.lm-modal-stars { display:flex; justify-content:center; gap:8px; margin-bottom:24px; }
-.lm-modal-star { font-size:36px; transition:all 0.3s; }
-.lm-modal-star.dim { filter:grayscale(1) opacity(0.25); }
-.lm-modal-actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
-.modal-btn { padding:12px 24px; border-radius:12px; font-family:'Heebo',sans-serif; font-size:15px; font-weight:800; border:none; cursor:pointer; transition:all 0.2s; }
-.modal-btn.primary { background:var(--blue); color:white; }
-.modal-btn.primary:hover { background:var(--blue-dark); transform:translateY(-1px); }
-.modal-btn.secondary { background:var(--bg); color:var(--text-soft); border:2px solid var(--border); }
-.modal-btn.secondary:hover { border-color:var(--blue); color:var(--blue); }
-
-/* ===== WORKSHEET SCREEN ===== */
-#screen-worksheet { background:var(--bg); }
-.ws-main { max-width:860px; margin:0 auto; padding:32px 24px 80px; }
-.ws-header { background:white; border-radius:20px; padding:28px 32px; margin-bottom:28px; box-shadow:var(--shadow); border-top:5px solid var(--blue); }
-.ws-meta-row { display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
-.ws-badge { padding:4px 12px; border-radius:100px; font-size:12px; font-weight:800; background:var(--blue-light); color:var(--blue); }
-.ws-badge.chapter { background:#fef9c3; color:#a16207; }
-.ws-title-big { font-size:24px; font-weight:900; color:var(--navy); margin-bottom:6px; }
-.ws-sub-text { font-size:14px; color:var(--text-soft); font-weight:500; }
-.progress-wrap { background:white; border-radius:14px; padding:16px 24px; margin-bottom:28px; display:flex; align-items:center; gap:16px; box-shadow:var(--shadow); }
-.progress-label { font-size:13px; font-weight:800; color:var(--text-soft); white-space:nowrap; }
-.progress-bar-bg { flex:1; height:10px; background:var(--border); border-radius:100px; overflow:hidden; }
-.progress-bar-fill { height:100%; background:linear-gradient(90deg,var(--blue),#60a5fa); border-radius:100px; transition:width 0.5s cubic-bezier(0.34,1.56,0.64,1); width:0%; }
-.progress-count { font-size:14px; font-weight:900; color:var(--navy); white-space:nowrap; }
-.section-card { background:white; border-radius:var(--radius); padding:26px 28px; margin-bottom:20px; box-shadow:var(--shadow); border:2px solid transparent; }
-.section-title-row { display:flex; align-items:flex-start; margin-bottom:20px; }
-.section-num-badge { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:var(--blue); color:white; font-size:13px; font-weight:900; margin-left:10px; flex-shrink:0; }
-.section-title-text { font-size:16px; font-weight:700; color:var(--navy); line-height:1.5; }
-.section-subtitle { font-size:13px; color:var(--text-soft); margin-top:4px; font-weight:500; }
-.q-grid { display:grid; gap:14px; grid-template-columns:1fr 1fr; }
-.q-box { background:var(--bg); border-radius:12px; padding:16px 18px; border:2px solid var(--border); transition:all 0.2s; position:relative; }
-.q-box.correct { border-color:var(--success); background:var(--success-bg); }
-.q-box.wrong { border-color:var(--error); background:var(--error-bg); }
-.q-num-badge { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:var(--border); color:var(--text-soft); font-size:11px; font-weight:900; margin-bottom:10px; }
-.q-box.correct .q-num-badge { background:var(--success); color:white; }
-.q-box.wrong .q-num-badge { background:var(--error); color:white; }
-.fb-icon { position:absolute; top:10px; left:10px; font-size:18px; display:none; }
-.q-box.correct .fb-icon, .q-box.wrong .fb-icon { display:block; }
-.expr { font-size:20px; font-weight:800; color:var(--navy); display:flex; align-items:center; gap:8px; flex-wrap:wrap; direction:ltr; justify-content:center; margin:8px 0; }
-.answer-input { width:70px; height:40px; border:2px solid var(--blue); border-radius:8px; background:white; font-family:'Heebo',sans-serif; font-size:18px; font-weight:800; color:var(--navy); text-align:center; outline:none; transition:all 0.2s; }
-.answer-input:focus { border-color:var(--blue-dark); box-shadow:0 0 0 3px rgba(45,107,228,0.15); }
-.answer-input:disabled { background:var(--bg); cursor:default; }
-.q-box.correct .answer-input { border-color:var(--success); background:var(--success-bg); color:var(--success); }
-.q-box.wrong .answer-input { border-color:var(--error); background:var(--error-bg); color:var(--error); }
-.compare-row { display:flex; align-items:center; justify-content:center; gap:10px; direction:ltr; }
-.compare-sides { font-size:18px; font-weight:800; color:var(--navy); white-space:nowrap; }
-.compare-input { width:52px; height:40px; border:2px solid var(--blue); border-radius:8px; background:white; font-family:'Heebo',sans-serif; font-size:20px; font-weight:900; color:var(--navy); text-align:center; outline:none; transition:all 0.2s; }
-.compare-input:focus { border-color:var(--blue-dark); box-shadow:0 0 0 3px rgba(45,107,228,0.15); }
-.compare-input:disabled { background:var(--bg); cursor:default; }
-.q-box.correct .compare-input { border-color:var(--success); background:var(--success-bg); color:var(--success); }
-.q-box.wrong .compare-input { border-color:var(--error); background:var(--error-bg); color:var(--error); }
-.correct-answer { font-size:12px; color:var(--error); font-weight:700; margin-top:6px; text-align:center; display:none; direction:rtl; }
-.q-box.wrong .correct-answer { display:block; }
-.submit-wrap { text-align:center; padding:32px 0 16px; }
-.btn-submit { background:var(--gold); color:var(--navy); border:none; border-radius:14px; padding:16px 48px; font-family:'Heebo',sans-serif; font-size:18px; font-weight:900; cursor:pointer; transition:all 0.2s; box-shadow:0 4px 20px rgba(245,197,24,0.4); }
-.btn-submit:hover { background:var(--gold-dark); transform:translateY(-2px); }
-.btn-submit:disabled { background:var(--border); color:var(--text-soft); cursor:default; box-shadow:none; transform:none; }
-.results-panel { background:white; border-radius:20px; padding:36px; margin-top:28px; box-shadow:var(--shadow-lg); text-align:center; display:none; border-top:5px solid var(--gold); }
-.results-panel.show { display:block; }
-.results-emoji { font-size:56px; margin-bottom:16px; }
-.results-title { font-size:26px; font-weight:900; color:var(--navy); margin-bottom:8px; }
-.results-sub { font-size:16px; color:var(--text-soft); margin-bottom:20px; }
-.results-stars { display:flex; justify-content:center; gap:10px; margin-bottom:24px; }
-.results-star { font-size:40px; transition:all 0.3s; filter:grayscale(1) opacity(0.25); }
-.results-star.earned { filter:none; animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
-.results-star:nth-child(2) { animation-delay:0.1s; }
-.results-star:nth-child(3) { animation-delay:0.2s; }
-@keyframes popIn { from{transform:scale(0);} to{transform:scale(1);} }
-.results-stats { display:flex; gap:24px; justify-content:center; flex-wrap:wrap; margin-bottom:28px; }
-.stat-pill { background:var(--bg); border-radius:12px; padding:16px 24px; text-align:center; border:2px solid var(--border); min-width:110px; }
-.stat-pill-val { font-size:32px; font-weight:900; color:var(--navy); line-height:1; }
-.stat-pill-val.gold-v { color:var(--gold-dark); }
-.stat-pill-val.green-v { color:var(--success); }
-.stat-pill-label { font-size:12px; color:var(--text-soft); font-weight:700; margin-top:6px; }
-.results-actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
-.btn-back-map { background:var(--blue); color:white; border:none; border-radius:12px; padding:14px 28px; font-family:'Heebo',sans-serif; font-size:16px; font-weight:800; cursor:pointer; transition:all 0.2s; }
-.btn-back-map:hover { background:var(--blue-dark); transform:translateY(-2px); }
-.btn-retry-ws { background:var(--bg); color:var(--text-soft); border:2px solid var(--border); border-radius:12px; padding:14px 28px; font-family:'Heebo',sans-serif; font-size:16px; font-weight:800; cursor:pointer; transition:all 0.2s; }
-.btn-retry-ws:hover { border-color:var(--blue); color:var(--blue); }
-
-/* COPYRIGHT */
-.copyright { text-align:center; margin-top:48px; font-size:11px; color:#aaa; font-weight:500; border-top:1px solid var(--border); padding-top:16px; }
-
-/* ===== ANIMATIONS ===== */
-@keyframes fadeUp { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
-.fadein { animation:fadeUp 0.4s ease both; }
-
-@media(max-width:768px) {
-  .topnav { padding:0 16px; }
-  .nav-links { display:none; }
-  .stats-row { grid-template-columns:1fr 1fr; }
-  .worksheets-grid { grid-template-columns:1fr; }
-  .badges-grid { grid-template-columns:1fr 1fr; }
-  .q-grid { grid-template-columns:1fr; }
-  .lm-main, .ws-main, .dash-content { padding:20px 14px 60px; }
-  .chapter-header { flex-direction:column; gap:16px; }
-  .features { grid-template-columns:1fr; }
-  .landing-nav { padding:16px 24px; }
-  .hero { padding:40px 24px; }
+@media (max-width: 768px) {
+  .landing-nav { padding: 16px 24px; }
+  .hero { padding: 40px 24px; }
+  .features { grid-template-columns: 1fr; }
 }
 </style>
 </head>
-<body>
+<body class="landing-page">
+<div class="stars-bg"></div>
+<div class="star-dots"></div>
 
-<!-- ===================== LANDING ===================== -->
-<div id="screen-landing" class="screen active">
-  <div class="stars-bg"></div>
-  <div class="star-dots"></div>
+<!-- ── Landing ────────────────────────────────────────── -->
+<div id="page-landing" class="page active">
   <nav class="landing-nav">
     <div class="logo">⭐ סטאר<span>קווסט</span></div>
     <div style="display:flex;gap:10px;">
-      <button class="btn btn-outline" style="padding:10px 20px;font-size:14px;" onclick="showScreen('login')">כניסה</button>
-      <button class="btn btn-primary" style="padding:10px 20px;font-size:14px;" onclick="showScreen('signup')">הצטרף חינם</button>
+      <button class="btn btn-outline" style="padding:10px 20px;font-size:14px;" onclick="showPage('login')">כניסה</button>
+      <button class="btn btn-primary" style="padding:10px 20px;font-size:14px;" onclick="showPage('signup')">הצטרף חינם</button>
     </div>
   </nav>
   <div class="hero">
@@ -332,7 +105,7 @@ body { font-family:'Heebo',sans-serif; background:var(--bg); color:var(--text); 
     <h1>למד. הרוויח. <span>גדל.</span></h1>
     <p class="hero-sub">צבור נקודות, פתח עיטורים ועלה בדירוג הכיתה — על ידי לימוד אמיתי.</p>
     <div class="hero-actions">
-      <button class="btn btn-primary" onclick="showScreen('signup')">🚀 התחל עכשיו — חינם</button>
+      <button class="btn btn-primary" onclick="showPage('signup')">🚀 התחל עכשיו — חינם</button>
       <button class="btn btn-outline" onclick="demoLogin()">👀 כניסת דמו</button>
     </div>
   </div>
@@ -344,15 +117,15 @@ body { font-family:'Heebo',sans-serif; background:var(--bg); color:var(--text); 
   <div class="landing-footer">סטארקווסט © 2026 · בטא · כיתה ד׳</div>
 </div>
 
-<!-- ===================== SIGNUP ===================== -->
-<div id="screen-signup" class="screen">
-  <div class="auth-card fadein">
+<!-- ── Signup ──────────────────────────────────────────── -->
+<div id="page-signup" class="page">
+  <div class="auth-card">
     <div class="auth-logo">⭐ סטארקווסט</div>
     <h2 class="auth-title">צור חשבון חדש</h2>
     <p class="auth-sub">הצטרף ותתחיל לצבור כוכבים! ⭐</p>
     <div class="form-group">
       <label class="form-label">השם שלך</label>
-      <input type="text" class="form-input" id="signup-name" placeholder="הזן את שמך הפרטי" />
+      <input type="text" class="form-input" id="signup-name" placeholder="הזן את שמך הפרטי">
       <div class="form-error" id="err-name">נא להזין שם</div>
     </div>
     <div class="form-group">
@@ -368,401 +141,56 @@ body { font-family:'Heebo',sans-serif; background:var(--bg); color:var(--text); 
     </div>
     <div class="form-group">
       <label class="form-label">סיסמה</label>
-      <input type="password" class="form-input" id="signup-pass" placeholder="בחר סיסמה (4+ תווים)" />
+      <input type="password" class="form-input" id="signup-pass" placeholder="בחר סיסמה (4+ תווים)">
       <div class="form-error" id="err-pass">הסיסמה חייבת להכיל לפחות 4 תווים</div>
     </div>
     <div class="form-group">
       <label class="form-label">אימות סיסמה</label>
-      <input type="password" class="form-input" id="signup-pass2" placeholder="חזור על הסיסמה" />
+      <input type="password" class="form-input" id="signup-pass2" placeholder="חזור על הסיסמה">
       <div class="form-error" id="err-pass2">הסיסמאות אינן תואמות</div>
     </div>
     <button class="btn btn-primary btn-full" onclick="doSignup()">🚀 צור חשבון</button>
-    <div class="auth-switch">כבר יש לך חשבון? <a onclick="showScreen('login')">התחבר כאן</a></div>
-    <div class="auth-switch" style="margin-top:8px;"><a onclick="showScreen('landing')" style="color:var(--text-soft);">← חזרה</a></div>
+    <div class="auth-switch">כבר יש לך חשבון? <a onclick="showPage('login')">התחבר כאן</a></div>
+    <div class="auth-switch" style="margin-top:8px;"><a onclick="showPage('landing')" style="color:var(--text-soft);">← חזרה</a></div>
   </div>
 </div>
 
-<!-- ===================== LOGIN ===================== -->
-<div id="screen-login" class="screen">
-  <div class="auth-card fadein">
+<!-- ── Login ───────────────────────────────────────────── -->
+<div id="page-login" class="page">
+  <div class="auth-card">
     <div class="auth-logo">⭐ סטארקווסט</div>
     <h2 class="auth-title">ברוך הבא חזרה!</h2>
     <p class="auth-sub">התחבר וממשיך לצבור כוכבים ⭐</p>
     <div class="form-group">
       <label class="form-label">השם שלך</label>
-      <input type="text" class="form-input" id="login-name" placeholder="הזן את שמך" />
+      <input type="text" class="form-input" id="login-name" placeholder="הזן את שמך">
     </div>
     <div class="form-group">
       <label class="form-label">סיסמה</label>
-      <input type="password" class="form-input" id="login-pass" placeholder="הזן סיסמה" />
+      <input type="password" class="form-input" id="login-pass" placeholder="הזן סיסמה">
     </div>
     <div class="form-error" id="err-login" style="display:block;margin-bottom:14px;"></div>
     <button class="btn btn-primary btn-full" onclick="doLogin()">⭐ כניסה</button>
     <div class="divider">או</div>
     <button class="btn btn-blue btn-full" onclick="demoLogin()">👀 כניסת דמו — ללא חשבון</button>
-    <div class="auth-switch" style="margin-top:16px;">משתמש חדש? <a onclick="showScreen('signup')">צור חשבון</a></div>
-    <div class="auth-switch" style="margin-top:8px;"><a onclick="showScreen('landing')" style="color:var(--text-soft);">← חזרה</a></div>
+    <div class="auth-switch" style="margin-top:16px;">משתמש חדש? <a onclick="showPage('signup')">צור חשבון</a></div>
+    <div class="auth-switch" style="margin-top:8px;"><a onclick="showPage('landing')" style="color:var(--text-soft);">← חזרה</a></div>
   </div>
 </div>
 
-<!-- ===================== DASHBOARD ===================== -->
-<div id="screen-dashboard" class="screen">
-  <nav class="topnav">
-    <div class="nav-logo">⭐ סטארקווסט</div>
-    <div class="nav-links">
-      <button class="nav-link active" onclick="showDash('home')" id="nav-home">🏠 בית</button>
-      <button class="nav-link" onclick="showDash('worksheets')" id="nav-worksheets">📝 דפי עבודה</button>
-      <button class="nav-link" onclick="showDash('leaderboard')" id="nav-leaderboard">🏆 דירוג</button>
-      <button class="nav-link" onclick="showDash('profile')" id="nav-profile">👤 פרופיל</button>
-    </div>
-    <div class="nav-right">
-      <button class="btn" onclick="logout()" style="padding:8px 14px;font-size:13px;border:2px solid var(--border);color:var(--text-soft);background:white;border-radius:10px;">יציאה</button>
-      <div class="nav-points" id="nav-points">⭐ 0 נק׳</div>
-      <div class="avatar" id="nav-avatar">?</div>
-    </div>
-  </nav>
-  <div class="dash-content">
-
-    <!-- בית -->
-    <div class="dash-section active" id="dash-home">
-      <h2 class="section-title" id="dash-greeting">שלום! 👋</h2>
-      <p class="section-sub">כך נראית ההתקדמות שלך</p>
-      <div class="stats-row">
-        <div class="stat-card"><div class="stat-label">⭐ סה״כ נקודות</div><div class="stat-value gold" id="stat-points">0</div><div class="stat-sub" id="stat-points-sub">בהצלחה!</div></div>
-        <div class="stat-card"><div class="stat-label">🏆 מיקום בכיתה</div><div class="stat-value blue" id="stat-rank">#—</div><div class="stat-sub">מתוך 28 תלמידים</div></div>
-        <div class="stat-card"><div class="stat-label">📝 נושאים הושלמו</div><div class="stat-value" id="stat-done">0</div><div class="stat-sub" id="stat-done-sub">התחל עכשיו!</div></div>
-        <div class="stat-card"><div class="stat-label">⭐ כוכבים</div><div class="stat-value" id="stat-stars">0</div><div class="stat-sub">מתוך 21 בפרק א׳</div></div>
-      </div>
-      <h3 style="font-size:17px;font-weight:900;margin-bottom:16px;color:var(--navy);">המשך ללמוד ←</h3>
-      <div class="worksheets-grid">
-        <div class="worksheet-card" onclick="showScreen('levelmap')">
-          <span class="ws-subject math">חשבון</span>
-          <div class="ws-title">פרק א׳ — כפל וחילוק</div>
-          <div style="font-size:13px;color:var(--text-soft);margin-top:6px;">7 נושאים · מפת שלבים</div>
-          <div class="ws-meta"><span class="ws-points" id="home-chapter-stars">⭐ 0 כוכבים</span><span style="margin-right:auto;font-size:12px;font-weight:800;color:var(--blue);">← כנס</span></div>
-        </div>
-        <div class="worksheet-card" onclick="showToast('📖 עברית יתווסף בקרוב!')">
-          <span class="ws-subject english">עברית</span>
-          <div class="ws-title">בקרוב — שפה ועברית</div>
-          <div style="font-size:13px;color:var(--text-soft);margin-top:6px;">בשלב הפיתוח</div>
-          <div class="ws-meta"><span class="ws-points" style="color:var(--text-soft);">🔒 נעול</span></div>
-        </div>
-        <div class="worksheet-card" onclick="showToast('🔬 מדעים יתווסף בקרוב!')">
-          <span class="ws-subject science">מדעים</span>
-          <div class="ws-title">בקרוב — מדעי הטבע</div>
-          <div style="font-size:13px;color:var(--text-soft);margin-top:6px;">בשלב הפיתוח</div>
-          <div class="ws-meta"><span class="ws-points" style="color:var(--text-soft);">🔒 נעול</span></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- דפי עבודה -->
-    <div class="dash-section" id="dash-worksheets">
-      <h2 class="section-title">דפי עבודה</h2>
-      <p class="section-sub">בחר מקצוע והתחל לצבור נקודות</p>
-      <div class="subject-filter">
-        <button class="filter-btn active" onclick="filterWS(this,'all')">הכל</button>
-        <button class="filter-btn" onclick="filterWS(this,'math')">📐 חשבון</button>
-        <button class="filter-btn" onclick="filterWS(this,'english')">📖 עברית</button>
-        <button class="filter-btn" onclick="filterWS(this,'science')">🔬 מדעים</button>
-      </div>
-      <div class="worksheets-grid" id="ws-grid">
-        <div class="worksheet-card" data-subject="math" onclick="showScreen('levelmap')">
-          <span class="ws-subject math">חשבון</span>
-          <div class="ws-title">פרק א׳ — כפל וחילוק בעשרות שלמות</div>
-          <div style="font-size:13px;color:var(--text-soft);margin-top:6px;">7 נושאים · מפת שלבים</div>
-          <div class="ws-meta"><span class="ws-points" id="ws-chapter-stars">⭐ 0 כוכבים</span><span style="margin-right:auto;font-size:12px;font-weight:800;color:var(--blue);">← כנס</span></div>
-        </div>
-        <div class="worksheet-card" data-subject="english" onclick="showToast('📖 עברית יתווסף בקרוב!')">
-          <span class="ws-subject english">עברית</span>
-          <div class="ws-title">שפה ועברית — בקרוב</div>
-          <div style="font-size:13px;color:var(--text-soft);margin-top:6px;">🔒 לא זמין עדיין</div>
-          <div class="ws-meta"><span class="ws-points" style="color:var(--text-soft);">בשלב הפיתוח</span></div>
-        </div>
-        <div class="worksheet-card" data-subject="science" onclick="showToast('🔬 מדעים יתווסף בקרוב!')">
-          <span class="ws-subject science">מדעים</span>
-          <div class="ws-title">מדעי הטבע — בקרוב</div>
-          <div style="font-size:13px;color:var(--text-soft);margin-top:6px;">🔒 לא זמין עדיין</div>
-          <div class="ws-meta"><span class="ws-points" style="color:var(--text-soft);">בשלב הפיתוח</span></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- דירוג -->
-    <div class="dash-section" id="dash-leaderboard">
-      <h2 class="section-title">טבלת דירוג</h2>
-      <p class="section-sub" id="lb-class-label">כיתה ד׳ — שבוע של 10 במרץ</p>
-      <div class="leaderboard-table">
-        <div class="lb-row header"><div>מיקום</div><div>תלמיד</div><div>נקודות</div><div></div></div>
-        <div id="lb-rows"><div style="padding:20px;text-align:center;color:var(--text-soft);font-size:14px;">טוען...</div></div>
-      </div>
-    </div>
-
-    <!-- פרופיל -->
-    <div class="dash-section" id="dash-profile">
-      <h2 class="section-title">הפרופיל שלי</h2>
-      <p class="section-sub">ההישגים והסטטיסטיקות שלך</p>
-      <div class="profile-top">
-        <div class="profile-avatar" id="profile-avatar">?</div>
-        <div class="profile-info">
-          <h2 id="profile-name">—</h2>
-          <p id="profile-class">כיתה —</p>
-          <div style="display:flex;gap:20px;margin-top:14px;">
-            <div><div style="font-size:22px;font-weight:900;color:var(--gold-dark);" id="profile-points">0</div><div style="font-size:12px;color:var(--text-soft);font-weight:700;">נקודות</div></div>
-            <div><div style="font-size:22px;font-weight:900;color:var(--blue);" id="profile-done">0</div><div style="font-size:12px;color:var(--text-soft);font-weight:700;">נושאים</div></div>
-            <div><div style="font-size:22px;font-weight:900;color:var(--navy);" id="profile-stars">0</div><div style="font-size:12px;color:var(--text-soft);font-weight:700;">כוכבים</div></div>
-          </div>
-        </div>
-      </div>
-      <h3 style="font-size:17px;font-weight:900;margin-bottom:16px;color:var(--navy);">עיטורים</h3>
-      <div class="badges-grid">
-        <div class="badge-card" id="badge-first"><div class="badge-icon">🚀</div><div class="badge-name">התחלה מטאורית</div><div class="badge-pts">השלם נושא ראשון</div></div>
-        <div class="badge-card" id="badge-perfect"><div class="badge-icon">💎</div><div class="badge-name">מושלם</div><div class="badge-pts">100% בנושא כלשהו</div></div>
-        <div class="badge-card" id="badge-streak"><div class="badge-icon">🔥</div><div class="badge-name">על האש</div><div class="badge-pts">3 נושאים ברצף</div></div>
-        <div class="badge-card" id="badge-allstars"><div class="badge-icon">⭐</div><div class="badge-name">כוכב פרק א׳</div><div class="badge-pts">השג כל 21 כוכבים</div></div>
-        <div class="badge-card"><div class="badge-icon">🏆</div><div class="badge-name">אלוף</div><div class="badge-pts">הגע למקום #1</div></div>
-        <div class="badge-card"><div class="badge-icon">📐</div><div class="badge-name">קוסם המתמטיקה</div><div class="badge-pts">השלם פרק א׳ כולו</div></div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ===================== LEVEL MAP ===================== -->
-<div id="screen-levelmap" class="screen">
-  <nav class="topnav">
-    <div class="nav-logo">⭐ סטארקווסט</div>
-    <div class="nav-links">
-      <button class="nav-link" onclick="showScreen('dashboard')">🏠 בית</button>
-      <button class="nav-link active">📝 דפי עבודה</button>
-      <button class="nav-link" onclick="showDash('leaderboard');showScreen('dashboard')">🏆 דירוג</button>
-    </div>
-    <div class="nav-right">
-      <div class="nav-points" id="lm-nav-points">⭐ 0 נק׳</div>
-      <div class="avatar" id="lm-nav-avatar">?</div>
-    </div>
-  </nav>
-  <div class="lm-main">
-    <div class="stars-banner">
-      <div class="stars-banner-left">
-        <div class="stars-total" id="lm-stars-total">⭐ 0</div>
-        <div>
-          <div style="font-size:15px;font-weight:900;color:var(--navy);">כוכבים שאספת</div>
-          <div style="font-size:13px;color:var(--text-soft);font-weight:600;">מתוך 21 אפשריים בפרק א׳</div>
-        </div>
-      </div>
-      <button class="nav-link" onclick="showScreen('dashboard')" style="font-size:13px;">← חזרה ללוח הבקרה</button>
-    </div>
-    <div class="chapter-header">
-      <div class="chapter-info">
-        <div class="chapter-badge">📐 חשבון</div>
-        <div class="chapter-title">פרק א׳ — כפל וחילוק בעשרות שלמות ובמאות שלמות</div>
-        <div class="chapter-sub">7 נושאים · עד 21 כוכבים</div>
-      </div>
-      <div class="chapter-progress-wrap">
-        <div class="chapter-ring" id="lm-ring">
-          <div class="chapter-ring-inner" id="lm-ring-inner">0/7</div>
-        </div>
-        <div class="chapter-ring-label">נושאים הושלמו</div>
-      </div>
-    </div>
-    <div id="lm-map"></div>
-    <div class="chapter-locked"><div style="font-size:32px;margin-bottom:8px;">🔒</div><div>פרק ב׳ — כפל</div><div style="font-size:12px;margin-top:4px;opacity:0.7;">השלם את פרק א׳ כדי לפתוח</div></div>
-  </div>
-  <!-- Level modal -->
-  <div class="lm-modal-overlay" id="lm-modal" onclick="closeLMModal(event)">
-    <div class="lm-modal">
-      <div class="lm-modal-emoji" id="lm-modal-emoji">📝</div>
-      <div class="lm-modal-title" id="lm-modal-title"></div>
-      <div class="lm-modal-sub" id="lm-modal-sub"></div>
-      <div class="lm-modal-stars" id="lm-modal-stars"></div>
-      <div class="lm-modal-actions" id="lm-modal-actions"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ===================== WORKSHEET ===================== -->
-<div id="screen-worksheet" class="screen">
-  <nav class="topnav">
-    <div class="nav-logo">⭐ סטארקווסט</div>
-    <div class="nav-links">
-      <button class="nav-link" onclick="showScreen('levelmap')">🗺️ מפת שלבים</button>
-    </div>
-    <div class="nav-right">
-      <div class="nav-points" id="ws-nav-points">⭐ 0 נק׳</div>
-      <div class="avatar" id="ws-nav-avatar">?</div>
-    </div>
-  </nav>
-  <div class="ws-main">
-    <div class="ws-header fadein">
-      <div class="ws-meta-row">
-        <span class="ws-badge chapter">פרק א׳</span>
-        <span class="ws-badge">חשבון</span>
-        <span class="ws-badge">נושא 7</span>
-      </div>
-      <div class="ws-title-big">תכונות ה-0 וה-1</div>
-      <div class="ws-sub-text">מלא את כל התרגילים ולחץ "סיום" לראות את הציון שלך ⭐</div>
-    </div>
-    <div class="progress-wrap">
-      <span class="progress-label">התקדמות:</span>
-      <div class="progress-bar-bg"><div class="progress-bar-fill" id="ws-progress-fill"></div></div>
-      <span class="progress-count" id="ws-progress-count">0 / 20</span>
-    </div>
-
-    <!-- Section 1 -->
-    <div class="section-card fadein" id="sec1">
-      <div class="section-title-row"><span class="section-num-badge">1</span><div><div class="section-title-text">פתרו את התרגילים.</div><div class="section-subtitle">השלם את המספר החסר</div></div></div>
-      <div class="q-grid">
-        <div class="q-box" id="q1"><div class="q-num-badge">א</div><div class="fb-icon" id="fb1"></div><div class="expr"><span>0 × 20 + 40 =</span><input class="answer-input" id="a1" type="number" placeholder="?" autocomplete="off"></div><div class="correct-answer" id="ca1"></div></div>
-        <div class="q-box" id="q2"><div class="q-num-badge">ב</div><div class="fb-icon" id="fb2"></div><div class="expr"><span>0 × (20 + 40) =</span><input class="answer-input" id="a2" type="number" placeholder="?" autocomplete="off"></div><div class="correct-answer" id="ca2"></div></div>
-        <div class="q-box" id="q3"><div class="q-num-badge">ג</div><div class="fb-icon" id="fb3"></div><div class="expr"><span>0 : 6 =</span><input class="answer-input" id="a3" type="number" placeholder="?" autocomplete="off"></div><div class="correct-answer" id="ca3"></div></div>
-        <div class="q-box" id="q4"><div class="q-num-badge">ד</div><div class="fb-icon" id="fb4"></div><div class="expr"><span>0 : 300 =</span><input class="answer-input" id="a4" type="number" placeholder="?" autocomplete="off"></div><div class="correct-answer" id="ca4"></div></div>
-      </div>
-    </div>
-
-    <!-- Section 2 -->
-    <div class="section-card fadein" id="sec2">
-      <div class="section-title-row"><span class="section-num-badge">2</span><div><div class="section-title-text">סמנו &lt;, &gt; או =</div><div class="section-subtitle">השווה בין הביטויים</div></div></div>
-      <div class="q-grid">
-        <div class="q-box" id="q5"><div class="q-num-badge">א</div><div class="fb-icon" id="fb5"></div><div class="compare-row"><span class="compare-sides">5,715 × 0</span><input class="compare-input" id="a5" type="text" placeholder="?" maxlength="1" autocomplete="off"><span class="compare-sides">5,715 + 0</span></div><div class="correct-answer" id="ca5"></div></div>
-        <div class="q-box" id="q6"><div class="q-num-badge">ב</div><div class="fb-icon" id="fb6"></div><div class="compare-row"><span class="compare-sides">4,893 × 1</span><input class="compare-input" id="a6" type="text" placeholder="?" maxlength="1" autocomplete="off"><span class="compare-sides">4,893 + 1</span></div><div class="correct-answer" id="ca6"></div></div>
-        <div class="q-box" id="q7"><div class="q-num-badge">ג</div><div class="fb-icon" id="fb7"></div><div class="compare-row"><span class="compare-sides">12,456 × 1</span><input class="compare-input" id="a7" type="text" placeholder="?" maxlength="1" autocomplete="off"><span class="compare-sides">12,456 + 0</span></div><div class="correct-answer" id="ca7"></div></div>
-        <div class="q-box" id="q8"><div class="q-num-badge">ד</div><div class="fb-icon" id="fb8"></div><div class="compare-row"><span class="compare-sides">10,245 × 0</span><input class="compare-input" id="a8" type="text" placeholder="?" maxlength="1" autocomplete="off"><span class="compare-sides">1 × 10,245</span></div><div class="correct-answer" id="ca8"></div></div>
-      </div>
-    </div>
-
-    <!-- Section 3 -->
-    <div class="section-card fadein" id="sec3">
-      <div class="section-title-row"><span class="section-num-badge">3</span><div><div class="section-title-text">פתרו את התרגילים.</div><div class="section-subtitle">שימו לב — חילוק ב-0!</div></div></div>
-      <div class="q-grid">
-        <div class="q-box" id="q9"><div class="q-num-badge">א</div><div class="fb-icon" id="fb9"></div><div class="expr"><span>0 : 3,000 =</span><input class="answer-input" id="a9" type="number" placeholder="?" autocomplete="off"></div><div class="correct-answer" id="ca9"></div></div>
-        <div class="q-box" id="q10"><div class="q-num-badge">ב</div><div class="fb-icon" id="fb10"></div><div class="expr"><span>300 : 0 =</span><input class="answer-input" id="a10" type="text" placeholder="?" autocomplete="off"></div><div class="correct-answer" id="ca10"></div></div>
-        <div class="q-box" id="q11"><div class="q-num-badge">ג</div><div class="fb-icon" id="fb11"></div><div class="expr"><span>3,000 : 1 =</span><input class="answer-input" id="a11" type="number" placeholder="?" autocomplete="off"></div><div class="correct-answer" id="ca11"></div></div>
-        <div class="q-box" id="q12"><div class="q-num-badge">ד</div><div class="fb-icon" id="fb12"></div><div class="expr"><span>300 × 0 =</span><input class="answer-input" id="a12" type="number" placeholder="?" autocomplete="off"></div><div class="correct-answer" id="ca12"></div></div>
-      </div>
-    </div>
-
-    <!-- Section 4 -->
-    <div class="section-card fadein" id="sec4">
-      <div class="section-title-row"><span class="section-num-badge">4</span><div><div class="section-title-text">סמנו &lt;, &gt; או =</div><div class="section-subtitle">יש אפשרויות שונות — חשבו טוב!</div></div></div>
-      <div class="q-grid">
-        <div class="q-box" id="q13"><div class="q-num-badge">א</div><div class="fb-icon" id="fb13"></div><div class="compare-row"><span class="compare-sides">0 : 180</span><input class="compare-input" id="a13" type="text" placeholder="?" maxlength="1" autocomplete="off"><span class="compare-sides">0 : 1,800</span></div><div class="correct-answer" id="ca13"></div></div>
-        <div class="q-box" id="q14"><div class="q-num-badge">ב</div><div class="fb-icon" id="fb14"></div><div class="compare-row"><span class="compare-sides">0 : 5,000</span><input class="compare-input" id="a14" type="text" placeholder="?" maxlength="1" autocomplete="off"><span class="compare-sides">0 + 500</span></div><div class="correct-answer" id="ca14"></div></div>
-        <div class="q-box" id="q15"><div class="q-num-badge">ג</div><div class="fb-icon" id="fb15"></div><div class="compare-row"><span class="compare-sides">0 × 2,000</span><input class="compare-input" id="a15" type="text" placeholder="?" maxlength="1" autocomplete="off"><span class="compare-sides">0 : 200</span></div><div class="correct-answer" id="ca15"></div></div>
-        <div class="q-box" id="q16"><div class="q-num-badge">ד</div><div class="fb-icon" id="fb16"></div><div class="compare-row"><span class="compare-sides">300 − 0</span><input class="compare-input" id="a16" type="text" placeholder="?" maxlength="1" autocomplete="off"><span class="compare-sides">0 : 3,000</span></div><div class="correct-answer" id="ca16"></div></div>
-      </div>
-    </div>
-
-    <!-- Section 5 -->
-    <div class="section-card fadein" id="sec5">
-      <div class="section-title-row"><span class="section-num-badge">5</span><div><div class="section-title-text">כתבו את המספר החסר.</div><div class="section-subtitle">שימו לב — יש אפשרויות שונות</div></div></div>
-      <div class="q-grid">
-        <div class="q-box" id="q17"><div class="q-num-badge">א</div><div class="fb-icon" id="fb17"></div><div class="expr"><input class="answer-input" id="a17" type="number" placeholder="?"><span>× 6,008 = 6,008</span></div><div class="correct-answer" id="ca17"></div></div>
-        <div class="q-box" id="q18"><div class="q-num-badge">ב</div><div class="fb-icon" id="fb18"></div><div class="expr"><input class="answer-input" id="a18" type="number" placeholder="?"><span>+ 6,008 = 6,008</span></div><div class="correct-answer" id="ca18"></div></div>
-        <div class="q-box" id="q19"><div class="q-num-badge">ג</div><div class="fb-icon" id="fb19"></div><div class="expr"><input class="answer-input" id="a19" type="number" placeholder="?"><span>: 6,008 = 1</span></div><div class="correct-answer" id="ca19"></div></div>
-        <div class="q-box" id="q20"><div class="q-num-badge">ד</div><div class="fb-icon" id="fb20"></div><div class="expr"><input class="answer-input" id="a20" type="number" placeholder="?"><span>: 6,008 = 0</span></div><div class="correct-answer" id="ca20"></div></div>
-      </div>
-    </div>
-
-    <div class="submit-wrap">
-      <button class="btn-submit" id="ws-btn-submit" onclick="wsSubmit()">✅ סיום — בדוק את התשובות שלי</button>
-    </div>
-
-    <!-- Results -->
-    <div class="results-panel" id="ws-results">
-      <div class="results-emoji" id="res-emoji">🌟</div>
-      <div class="results-title" id="res-title">כל הכבוד!</div>
-      <div class="results-sub" id="res-sub">עבודה מצוינת</div>
-      <div class="results-stars" id="res-stars">
-        <span class="results-star" id="rstar1">⭐</span>
-        <span class="results-star" id="rstar2">⭐</span>
-        <span class="results-star" id="rstar3">⭐</span>
-      </div>
-      <div class="results-stats">
-        <div class="stat-pill"><div class="stat-pill-val gold-v" id="res-points">0</div><div class="stat-pill-label">נקודות הרווחת</div></div>
-        <div class="stat-pill"><div class="stat-pill-val green-v" id="res-correct">0</div><div class="stat-pill-label">תשובות נכונות</div></div>
-        <div class="stat-pill"><div class="stat-pill-val" id="res-pct">0%</div><div class="stat-pill-label">ציון</div></div>
-      </div>
-      <div class="results-actions">
-        <button class="btn-back-map" onclick="returnToMap()">🗺️ חזור למפת השלבים</button>
-        <button class="btn-retry-ws" onclick="wsRetry()">🔄 נסה שוב</button>
-      </div>
-    </div>
-
-    <div class="copyright">חומרי הלימוד © בעלי הזכויות המקוריים. מוצג לצרכי דמו בלבד. | סטארקווסט 2026</div>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
+<script src="sq-core.js"></script>
 <script>
-// ============================================================
-// SUPABASE
-// ============================================================
-const SUPABASE_URL = 'https://xyvqlpzlgkyylvxdeiiy.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_BdIEzaevyWXQLBcl7gqMaQ_AvOAjBN_';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-let currentUser  = null;  // { id, name, cls, points }
-let userProgress = {};    // { noshe7: { stars, score, points, attempts } }
-
-// Loading overlay helpers
-function showLoading(msg='...') {
-  let el = document.getElementById('loading-overlay');
-  if (!el) {
-    el = document.createElement('div');
-    el.id = 'loading-overlay';
-    el.style.cssText = 'position:fixed;inset:0;background:rgba(26,26,46,0.55);z-index:9998;display:flex;align-items:center;justify-content:center;';
-    el.innerHTML = '<div style="background:white;border-radius:16px;padding:28px 40px;font-family:Heebo,sans-serif;font-size:16px;font-weight:800;color:#1A1A2E;text-align:center;">'+msg+'</div>';
-    document.body.appendChild(el);
-  } else {
-    el.querySelector('div').textContent = msg;
-    el.style.display = 'flex';
-  }
-}
-function hideLoading() {
-  const el = document.getElementById('loading-overlay');
-  if (el) el.style.display = 'none';
+// If already logged in, go straight to dashboard
+if (getSession()) {
+  window.location.href = 'app.html';
 }
 
-// Simple SHA-256 hash
-async function hashPass(pass) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pass + 'starquest_salt'));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.body.style.background = (name === 'landing') ? '' : 'var(--bg)';
 }
 
-// ============================================================
-// SCREEN NAVIGATION
-// ============================================================
-function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + name).classList.add('active');
-  window.scrollTo(0, 0);
-
-  if (name === 'levelmap')  renderLevelMap();
-  if (name === 'dashboard') refreshDashboard();
-  if (name === 'worksheet') wsReset();
-  if (name === 'levelmap' || name === 'worksheet') syncNavBars();
-}
-
-function syncNavBars() {
-  if (!currentUser) return;
-  const pts = currentUser.points || 0;
-  const initial = currentUser.name[0];
-  ['lm-nav-points','ws-nav-points'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = '⭐ ' + pts + ' נק׳';
-  });
-  ['lm-nav-avatar','ws-nav-avatar'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = initial;
-  });
-}
-
-// ============================================================
-// AUTH
-// ============================================================
 async function doSignup() {
   const name  = document.getElementById('signup-name').value.trim();
   const cls   = document.getElementById('signup-class').value;
@@ -777,7 +205,6 @@ async function doSignup() {
 
   showLoading('יוצר חשבון...');
   try {
-    // Check name not taken
     const { data: existing } = await sb.from('users').select('id').ilike('name', name).maybeSingle();
     if (existing) {
       document.getElementById('err-name').textContent = 'שם זה כבר קיים — נסה להתחבר';
@@ -789,7 +216,7 @@ async function doSignup() {
       .insert({ name, class: cls, password_hash: hash })
       .select().single();
     if (error) throw error;
-    await loginAs(user);
+    await completeLogin(user);
   } catch(e) {
     document.getElementById('err-name').textContent = 'שגיאה: ' + e.message;
     document.getElementById('err-name').style.display = 'block';
@@ -810,7 +237,7 @@ async function doLogin() {
     const hash = await hashPass(pass);
     if (user.password_hash !== hash) { errEl.textContent = '⚠️ סיסמה שגויה'; hideLoading(); return; }
     errEl.textContent = '';
-    await loginAs(user);
+    await completeLogin(user);
   } catch(e) {
     errEl.textContent = 'שגיאה: ' + e.message;
   }
@@ -820,7 +247,6 @@ async function doLogin() {
 async function demoLogin() {
   showLoading('טוען דמו...');
   try {
-    // Get or create demo user
     let { data: user } = await sb.from('users').select('*').eq('name', 'דניאל-דמו').maybeSingle();
     if (!user) {
       const hash = await hashPass('demo1234');
@@ -829,474 +255,39 @@ async function demoLogin() {
         .select().single();
       if (error) throw error;
       user = newUser;
-      // Seed demo progress
       await sb.from('progress').upsert({
         user_id: user.id, topic_id: 'noshe7',
         score: 85, stars: 2, points: 85, attempts: 1
       });
     }
-    // Override display name to דניאל
-    await loginAs({ ...user, name: 'דניאל' });
+    await completeLogin({ ...user, name: 'דניאל' });
   } catch(e) {
-    showToast('שגיאה בכניסת דמו: ' + e.message);
+    hideLoading();
+    alert('שגיאה בכניסת דמו: ' + e.message);
   }
+}
+
+async function completeLogin(user) {
+  const progress = await loadProgress(user.id);
+  const { totalPoints } = computeTotals(progress);
+
+  saveSession({
+    id:     user.id,
+    name:   user.name,
+    cls:    user.class,
+    points: totalPoints
+  });
+
+  sb.from('sessions').insert({ user_id: user.id }).catch(() => {});
   hideLoading();
+  window.location.href = 'app.html';
 }
 
-async function loginAs(user) {
-  // Load progress from Supabase
-  const { data: rows } = await sb.from('progress').select('*').eq('user_id', user.id);
-  userProgress = {};
-  (rows || []).forEach(r => {
-    userProgress[r.topic_id] = { stars: r.stars, score: r.score, points: r.points, attempts: r.attempts };
-  });
-
-  const totalPts = Object.values(userProgress).reduce((s,p) => s+(p.points||0), 0);
-  currentUser = { id: user.id, name: user.name, cls: user.class, points: totalPts };
-
-  // Log session (fire and forget)
-  sb.from('sessions').insert({ user_id: user.id }).then(() => {});
-
-  const hour = new Date().getHours();
-  const greet = hour < 12 ? 'בוקר טוב' : hour < 17 ? 'צהריים טובים' : 'ערב טוב';
-  document.getElementById('dash-greeting').textContent = greet + ', ' + user.name + '! 👋';
-  document.getElementById('nav-avatar').textContent    = user.name[0];
-  document.getElementById('nav-points').textContent   = '⭐ ' + totalPts + ' נק׳';
-
-  showScreen('dashboard');
-  showDash('home');
-  showToast('⭐ ברוך הבא חזרה, ' + user.name + '!');
-}
-
-function logout() {
-  currentUser  = null;
-  userProgress = {};
-  showScreen('landing');
-}
-
-// ============================================================
-// DASHBOARD
-// ============================================================
-function showDash(section) {
-  document.querySelectorAll('.dash-section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-  document.getElementById('dash-' + section).classList.add('active');
-  const navEl = document.getElementById('nav-' + section);
-  if (navEl) navEl.classList.add('active');
-}
-
-async function refreshDashboard() {
-  if (!currentUser) return;
-
-  // Reload progress from Supabase (fresh data)
-  const { data: rows } = await sb.from('progress').select('*').eq('user_id', currentUser.id);
-  userProgress = {};
-  (rows || []).forEach(r => {
-    userProgress[r.topic_id] = { stars: r.stars, score: r.score, points: r.points, attempts: r.attempts };
-  });
-
-  const prog = userProgress;
-  const totalStars = Object.values(prog).reduce((s,p) => s+(p.stars||0), 0);
-  const totalPts   = Object.values(prog).reduce((s,p) => s+(p.points||0), 0);
-  const doneCount  = Object.values(prog).filter(p => (p.stars||0) > 0).length;
-  currentUser.points = totalPts;
-
-  document.getElementById('nav-points').textContent   = '⭐ ' + totalPts + ' נק׳';
-  document.getElementById('stat-points').textContent  = totalPts;
-  document.getElementById('stat-stars').textContent   = totalStars;
-  document.getElementById('stat-done').textContent    = doneCount;
-  document.getElementById('home-chapter-stars').textContent = '⭐ ' + totalStars + ' כוכבים';
-  document.getElementById('ws-chapter-stars').textContent   = '⭐ ' + totalStars + ' כוכבים';
-
-  // Real leaderboard from Supabase — render all rows
-  const { data: lb } = await sb.from('leaderboard').select('*').order('rank');
-  const me = (lb||[]).find(r => r.id === currentUser.id);
-  const rank = me ? me.rank : '—';
-
-  document.getElementById('stat-rank').textContent      = '#' + rank;
-  document.getElementById('lb-class-label').textContent = 'כיתה ' + currentUser.cls;
-
-  const medals = ['🥇','🥈','🥉'];
-  const badges = ['🔥','⚡','⭐',''];
-  const rowsHtml = (lb||[]).slice(0,10).map((r, i) => {
-    const isMe = r.id === currentUser.id;
-    const rankLabel = i < 3 ? medals[i] : `<span style="font-size:15px;">${r.rank}</span>`;
-    const avatarStyle = isMe ? 'background:var(--blue);color:white;' : '';
-    const rowClass = ['lb-row', i===0?'top-1':i===1?'top-2':i===2?'top-3':'', isMe?'me':''].filter(Boolean).join(' ');
-    const nameLabel = isMe ? r.name + ' (אתה)' : r.name;
-    const ptsStyle = isMe ? 'style="color:var(--blue);"' : '';
-    return `<div class="${rowClass}">
-      <div class="lb-rank">${rankLabel}</div>
-      <div class="lb-name"><div class="lb-avatar" style="${avatarStyle}">${r.name[0]}</div>${nameLabel}</div>
-      <div class="lb-points" ${ptsStyle}>${r.total_points}</div>
-      <div class="lb-badge">${badges[i]||''}</div>
-    </div>`;
-  }).join('');
-
-  document.getElementById('lb-rows').innerHTML = rowsHtml ||
-    '<div style="padding:20px;text-align:center;color:var(--text-soft);font-size:14px;">אין תלמידים עדיין</div>';
-
-  document.getElementById('profile-name').textContent   = currentUser.name;
-  document.getElementById('profile-avatar').textContent = currentUser.name[0];
-  document.getElementById('profile-class').textContent  = 'כיתה ' + currentUser.cls + ' · מקום #' + rank;
-  document.getElementById('profile-points').textContent = totalPts;
-  document.getElementById('profile-done').textContent   = doneCount;
-  document.getElementById('profile-stars').textContent  = totalStars;
-
-  // Badges
-  if (doneCount >= 1)  document.getElementById('badge-first').classList.add('earned');
-  if (Object.values(prog).some(p => p.score === 100)) document.getElementById('badge-perfect').classList.add('earned');
-  if (totalStars >= 21) document.getElementById('badge-allstars').classList.add('earned');
-}
-
-function filterWS(btn, subject) {
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('#ws-grid .worksheet-card').forEach(card => {
-    card.style.display = (subject === 'all' || card.dataset.subject === subject) ? '' : 'none';
-  });
-}
-
-// ============================================================
-// LEVEL MAP
-// ============================================================
-const LEVELS = [
-  { id:'noshe7', num:'נושא 7', title:'תכונות ה-0 וה-1',                              questions:20, minutes:15, hasWorksheet:true  },
-  { id:'noshe6', num:'נושא 6', title:'סדר פעולות החשבון ושימוש בסוגריים',            questions:18, minutes:12, hasWorksheet:false },
-  { id:'noshe5', num:'נושא 5', title:'הקשר בין כפל לבין חילוק',                      questions:16, minutes:10, hasWorksheet:false },
-  { id:'noshe4', num:'נושא 4', title:'חילוק בעשרות שלמות ובמאות שלמות',             questions:20, minutes:12, hasWorksheet:false },
-  { id:'noshe3', num:'נושא 3', title:'חילוק במחלק חד-ספרתי ב-10, ב-100 וב-1,000',  questions:18, minutes:10, hasWorksheet:false },
-  { id:'noshe2', num:'נושא 2', title:'כפל בעשרות שלמות ובמאות שלמות',               questions:20, minutes:12, hasWorksheet:false },
-  { id:'noshe1', num:'נושא 1', title:'כפל ב-10, ב-100 וב-1,000',                    questions:18, minutes:10, hasWorksheet:false },
-];
-
-function getLevelState(levelId) {
-  if (!currentUser) return 'locked';
-  const prog = userProgress;
-  const p = prog[levelId];
-  if (p && p.stars > 0) return 'done';
-  // A level is active if the previous one (index-1 in LEVELS) is done or it's noshe7
-  const idx = LEVELS.findIndex(l => l.id === levelId);
-  if (idx === 0) return 'active'; // noshe7 always active first
-  const prev = LEVELS[idx - 1];
-  const prevProg = prog[prev.id];
-  if (prevProg && prevProg.stars > 0) return 'active';
-  return 'locked';
-}
-
-function getLevelData(levelId) {
-  if (!currentUser) return null;
-  return userProgress[levelId] || null;
-}
-
-function renderLevelMap() {
-  if (!currentUser) return;
-  const prog = userProgress;
-  const totalStars = Object.values(prog).reduce((s,p) => s+(p.stars||0), 0);
-  const doneCount  = Object.values(prog).filter(p=>(p.stars||0)>0).length;
-
-  document.getElementById('lm-stars-total').textContent = '⭐ ' + totalStars;
-  document.getElementById('lm-ring-inner').textContent  = doneCount + '/7';
-  // Update ring gradient
-  const pct = Math.round((doneCount/7)*100);
-  document.getElementById('lm-ring').style.background =
-    `conic-gradient(var(--gold) ${pct}%, rgba(255,255,255,0.1) 0%)`;
-
-  let html = '';
-  LEVELS.forEach((level, idx) => {
-    const lstate = getLevelState(level.id);
-    const ldata  = getLevelData(level.id);
-    const stars  = ldata ? ldata.stars : 0;
-    const score  = ldata ? ldata.score : 0;
-
-    if (idx > 0) {
-      const prevState = getLevelState(LEVELS[idx-1].id);
-      html += `<div class="connector ${prevState==='done'?'done':lstate==='active'?'active':''}"></div>`;
-    }
-
-    const nodeClass = lstate === 'done' ? 'done' : lstate === 'active' ? 'active' : 'locked';
-    const nodeIcon  = lstate === 'done' ? '✓' : lstate === 'active' ? '▶' : '🔒';
-    const cardClass = lstate === 'done' ? 'done-card' : lstate === 'active' ? 'active-card' : 'locked-card';
-
-    let starsHtml = '<div class="stars-row">';
-    for (let i=1;i<=3;i++) starsHtml += `<span class="star-icon ${i<=stars?'earned':''}">⭐</span>`;
-    starsHtml += '</div>';
-    if (lstate === 'locked') starsHtml = '<span style="font-size:12px;color:#94a3b8">🔒 נעול</span>';
-
-    let scoreBadge = '';
-    if (lstate === 'done') {
-      const cls = score===100?'perfect':score>=80?'good':'pass';
-      scoreBadge = `<span class="score-badge ${cls}">${score}%</span>`;
-    }
-
-    const btnHtml = lstate==='done'
-      ? `<button class="level-btn btn-retry" onclick="openLevelModal('${level.id}')">שפר ⭐</button>`
-      : lstate==='active'
-        ? `<button class="level-btn btn-start" onclick="openLevelModal('${level.id}')">התחל ▶</button>`
-        : `<button class="level-btn btn-locked">🔒 נעול</button>`;
-
-    const clickHandler = lstate !== 'locked' ? `onclick="openLevelModal('${level.id}')"` : '';
-
-    html += `
-      <div class="level-row">
-        <div class="level-node ${nodeClass}">${nodeIcon}</div>
-        <div class="level-card ${cardClass}" ${clickHandler}>
-          <div class="level-card-left">
-            <div class="level-num">${level.num}</div>
-            <div class="level-title">${level.title}</div>
-            <div class="level-meta">
-              <span>${level.questions} שאלות</span>
-              <span class="level-meta-dot"></span>
-              <span>~${level.minutes} דק׳</span>
-              ${lstate==='done'?`<span class="level-meta-dot"></span>${scoreBadge}`:''}
-            </div>
-          </div>
-          <div class="level-card-right">${starsHtml}${btnHtml}</div>
-        </div>
-      </div>`;
-  });
-  document.getElementById('lm-map').innerHTML = html;
-}
-
-let activeLevelId = null;
-
-function openLevelModal(id) {
-  const level = LEVELS.find(l => l.id === id);
-  const lstate = getLevelState(id);
-  if (!level || lstate === 'locked') return;
-  activeLevelId = id;
-
-  const ldata = getLevelData(id);
-  const isDone = lstate === 'done';
-  const stars  = ldata ? ldata.stars : 0;
-
-  document.getElementById('lm-modal-emoji').textContent = isDone ? '⭐' : '📝';
-  document.getElementById('lm-modal-title').textContent = level.title;
-  document.getElementById('lm-modal-sub').textContent   = isDone
-    ? `ציון קודם: ${ldata.score}% · רוצה לשפר?`
-    : `${level.questions} שאלות · ~${level.minutes} דקות`;
-
-  let starsHtml = '';
-  for (let i=1;i<=3;i++) starsHtml += `<span class="lm-modal-star ${i<=stars?'':'dim'}">⭐</span>`;
-  document.getElementById('lm-modal-stars').innerHTML = starsHtml;
-
-  const actions = isDone
-    ? `<button class="modal-btn primary" onclick="startLevel('${id}')">🔄 שחק שוב</button>
-       <button class="modal-btn secondary" onclick="closeLMModal()">ביטול</button>`
-    : level.hasWorksheet
-      ? `<button class="modal-btn primary" onclick="startLevel('${id}')">▶ התחל עכשיו!</button>
-         <button class="modal-btn secondary" onclick="closeLMModal()">אחר כך</button>`
-      : `<button class="modal-btn primary" onclick="comingSoon()">🚀 בקרוב!</button>
-         <button class="modal-btn secondary" onclick="closeLMModal()">סגור</button>`;
-
-  document.getElementById('lm-modal-actions').innerHTML = actions;
-  document.getElementById('lm-modal').classList.add('show');
-}
-
-function startLevel(id) {
-  document.getElementById('lm-modal').classList.remove('show');
-  if (id === 'noshe7') {
-    showScreen('worksheet');
-  } else {
-    showToast('🚀 נושא זה יהיה זמין בקרוב!');
-  }
-}
-
-function comingSoon() {
-  document.getElementById('lm-modal').classList.remove('show');
-  showToast('🚀 בקרוב!');
-}
-
-function closeLMModal(e) {
-  if (!e || e.target === document.getElementById('lm-modal'))
-    document.getElementById('lm-modal').classList.remove('show');
-}
-
-// ============================================================
-// WORKSHEET — נושא 7
-// ============================================================
-const WS_ANSWERS = {
-  a1:  { val:'40',       type:'num' },
-  a2:  { val:'0',        type:'num' },
-  a3:  { val:'0',        type:'num' },
-  a4:  { val:'0',        type:'num' },
-  a5:  { val:'<',        type:'cmp' },
-  a6:  { val:'<',        type:'cmp' },
-  a7:  { val:'=',        type:'cmp' },
-  a8:  { val:'<',        type:'cmp' },
-  a9:  { val:'0',        type:'num' },
-  a10: { val:'אי-אפשר', type:'txt' },
-  a11: { val:'3000',     type:'num' },
-  a12: { val:'0',        type:'num' },
-  a13: { val:'=',        type:'cmp' },
-  a14: { val:'<',        type:'cmp' },
-  a15: { val:'=',        type:'cmp' },
-  a16: { val:'>',        type:'cmp' },
-  a17: { val:'1',        type:'num' },
-  a18: { val:'0',        type:'num' },
-  a19: { val:'6008',     type:'num' },
-  a20: { val:'0',        type:'num' },
-};
-const WS_TOTAL = 20;
-const WS_PTS_PER_Q = 5;
-let wsSubmitted = false;
-
-function wsReset() {
-  wsSubmitted = false;
-  document.getElementById('ws-btn-submit').disabled = false;
-  document.getElementById('ws-results').classList.remove('show');
-  document.getElementById('ws-progress-fill').style.width = '0%';
-  document.getElementById('ws-progress-count').textContent = '0 / ' + WS_TOTAL;
-  Object.keys(WS_ANSWERS).forEach(id => {
-    const num = id.replace('a','');
-    const box = document.getElementById('q'+num);
-    const fb  = document.getElementById('fb'+num);
-    const ca  = document.getElementById('ca'+num);
-    const el  = document.getElementById(id);
-    if (!el) return;
-    el.value = ''; el.disabled = false;
-    if (box) box.classList.remove('correct','wrong');
-    if (fb) fb.textContent = '';
-    if (ca) ca.textContent = '';
-  });
-}
-
-function wsUpdateProgress() {
-  let filled = 0;
-  Object.keys(WS_ANSWERS).forEach(id => {
-    const el = document.getElementById(id);
-    if (el && el.value.trim() !== '') filled++;
-  });
-  const pct = Math.round((filled/WS_TOTAL)*100);
-  document.getElementById('ws-progress-fill').style.width = pct+'%';
-  document.getElementById('ws-progress-count').textContent = filled+' / '+WS_TOTAL;
-}
-
-function wsCheckAnswer(id) {
-  const el  = document.getElementById(id);
-  const ans = WS_ANSWERS[id];
-  const user = el.value.trim().replace(/\s/g,'').replace(/,/g,'');
-  const correct = ans.val.replace(/,/g,'');
-  if (id === 'a10') {
-    return ['אי-אפשר','איאפשר','לאמוגדר','undefined','לא'].some(s => user.includes(s));
-  }
-  return user === correct;
-}
-
-async function wsSubmit() {
-  if (wsSubmitted) return;
-  wsSubmitted = true;
-  let correctCount = 0;
-
-  Object.keys(WS_ANSWERS).forEach(aId => {
-    const num = aId.replace('a','');
-    const box = document.getElementById('q'+num);
-    const fb  = document.getElementById('fb'+num);
-    const ca  = document.getElementById('ca'+num);
-    const el  = document.getElementById(aId);
-    el.disabled = true;
-    const ok = wsCheckAnswer(aId);
-    if (ok) {
-      box.classList.add('correct'); fb.textContent = '✅'; correctCount++;
-    } else {
-      box.classList.add('wrong'); fb.textContent = '❌';
-      let disp = WS_ANSWERS[aId].val;
-      if (aId==='a10') disp = 'אי-אפשר';
-      ca.textContent = 'תשובה נכונה: ' + disp;
-    }
-  });
-
-  const score = Math.round((correctCount/WS_TOTAL)*100);
-  const pts   = correctCount * WS_PTS_PER_Q;
-  const stars = score>=100 ? 3 : score>=80 ? 2 : score>=60 ? 1 : 0;
-
-  // Save to state — only upgrade stars/score
-  if (currentUser) {
-    const prog = userProgress;
-    const prev = prog['noshe7'] || {};
-    if (!prev.stars || stars > prev.stars || (stars === prev.stars && score > (prev.score||0))) {
-      prog['noshe7'] = { stars, score, points: pts };
-      state.progress[currentUser.key] = prog;
-      // Update user total points
-      let totalPts = 0;
-      Object.values(prog).forEach(p => totalPts += (p.points||0));
-      if (state.users[currentUser.key]) state.users[currentUser.key].points = totalPts;
-      currentUser.points = totalPts;
-      saveState(state);
-    }
-  }
-
-  // Show results
-  const panel = document.getElementById('ws-results');
-  panel.classList.add('show');
-  document.getElementById('res-correct').textContent = correctCount;
-  document.getElementById('res-points').textContent  = pts;
-  document.getElementById('res-pct').textContent     = score + '%';
-  document.getElementById('ws-btn-submit').disabled  = true;
-  document.getElementById('ws-nav-points').textContent = '⭐ ' + (currentUser ? currentUser.points : pts) + ' נק׳';
-
-  // Stars animation
-  for (let i=1;i<=3;i++) {
-    const el = document.getElementById('rstar'+i);
-    el.classList.remove('earned');
-    if (i <= stars) setTimeout(() => el.classList.add('earned'), i*200);
-  }
-
-  let emoji, title, sub;
-  if (score===100)      { emoji='🏆'; title='מושלם! 100%!'; sub='ענקי! כל התשובות נכונות!'; }
-  else if (score>=80)   { emoji='🌟'; title='כל הכבוד!'; sub='עבודה מצוינת!'; }
-  else if (score>=60)   { emoji='👍'; title='יפה מאוד!'; sub='עוד קצת תרגול ותגיע ל-100%!'; }
-  else                  { emoji='💪'; title='ממשיכים להתאמן!'; sub='תעבור על החומר ותנסה שוב.'; }
-
-  document.getElementById('res-emoji').textContent = emoji;
-  document.getElementById('res-title').textContent = title;
-  document.getElementById('res-sub').textContent   = sub;
-
-  document.getElementById('ws-progress-fill').style.width = '100%';
-  document.getElementById('ws-progress-count').textContent = WS_TOTAL+' / '+WS_TOTAL;
-
-  setTimeout(() => panel.scrollIntoView({ behavior:'smooth', block:'start' }), 200);
-
-  if (stars > 0) showToast('⭐ '+['','כוכב אחד','שני כוכבים','שלושה כוכבים!'][stars]+' — שמור!');
-}
-
-function wsRetry() {
-  wsReset();
-  window.scrollTo({top:0, behavior:'smooth'});
-}
-
-function returnToMap() {
-  showScreen('levelmap');
-}
-
-// ============================================================
-// TOAST
-// ============================================================
-let toastTimer;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
-}
-
-// ============================================================
-// INIT
-// ============================================================
-Object.keys(WS_ANSWERS).forEach(id => {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener('input', wsUpdateProgress);
+// Enter key support
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  document.getElementById('signup-pass2').addEventListener('keydown', e => { if (e.key === 'Enter') doSignup(); });
 });
-document.getElementById('login-pass').addEventListener('keydown',    e => { if(e.key==='Enter') doLogin(); });
-document.getElementById('signup-pass2').addEventListener('keydown',  e => { if(e.key==='Enter') doSignup(); });
-
-// Make wsSubmit async-aware
-const _origWsSubmit = wsSubmit;
-window.wsSubmit = async function() {
-  document.getElementById('ws-btn-submit').disabled = true;
-  await _origWsSubmit();
-};
 </script>
 </body>
 </html>
