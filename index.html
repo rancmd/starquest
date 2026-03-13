@@ -278,7 +278,7 @@ async function completeLogin(user) {
     points: totalPoints
   });
 
-  sb.from('sessions').insert({ user_id: user.id }).catch(() => {});
+  sb.from('sessions').insert({ user_id: user.id }).then(() => {});
   hideLoading();
   window.location.href = 'app.html';
 }
