@@ -494,13 +494,7 @@ body { font-family:'Heebo',sans-serif; background:var(--bg); color:var(--text); 
       <p class="section-sub" id="lb-class-label">כיתה ד׳ — שבוע של 10 במרץ</p>
       <div class="leaderboard-table">
         <div class="lb-row header"><div>מיקום</div><div>תלמיד</div><div>נקודות</div><div></div></div>
-        <div class="lb-row top-1"><div class="lb-rank">🥇</div><div class="lb-name"><div class="lb-avatar">י</div>יעל</div><div class="lb-points">520</div><div class="lb-badge">🔥</div></div>
-        <div class="lb-row top-2"><div class="lb-rank">🥈</div><div class="lb-name"><div class="lb-avatar">נ</div>נועם</div><div class="lb-points">480</div><div class="lb-badge">⚡</div></div>
-        <div class="lb-row top-3 me" id="lb-me-row"><div class="lb-rank">🥉</div><div class="lb-name"><div class="lb-avatar" style="background:var(--blue);color:white;" id="lb-me-avatar">?</div><span id="lb-me-name">אתה</span></div><div class="lb-points" style="color:var(--blue);" id="lb-me-pts">0</div><div class="lb-badge">⭐</div></div>
-        <div class="lb-row"><div class="lb-rank" style="font-size:15px;">4</div><div class="lb-name"><div class="lb-avatar">ת</div>תום</div><div class="lb-points">310</div><div></div></div>
-        <div class="lb-row"><div class="lb-rank" style="font-size:15px;">5</div><div class="lb-name"><div class="lb-avatar">מ</div>מיה</div><div class="lb-points">280</div><div></div></div>
-        <div class="lb-row"><div class="lb-rank" style="font-size:15px;">6</div><div class="lb-name"><div class="lb-avatar">ד</div>דן</div><div class="lb-points">255</div><div></div></div>
-        <div class="lb-row"><div class="lb-rank" style="font-size:15px;">7</div><div class="lb-name"><div class="lb-avatar">ל</div>ליאור</div><div class="lb-points">240</div><div></div></div>
+        <div id="lb-rows"><div style="padding:20px;text-align:center;color:var(--text-soft);font-size:14px;">טוען...</div></div>
       </div>
     </div>
 
@@ -914,16 +908,33 @@ async function refreshDashboard() {
   document.getElementById('home-chapter-stars').textContent = '⭐ ' + totalStars + ' כוכבים';
   document.getElementById('ws-chapter-stars').textContent   = '⭐ ' + totalStars + ' כוכבים';
 
-  // Real leaderboard from Supabase
+  // Real leaderboard from Supabase — render all rows
   const { data: lb } = await sb.from('leaderboard').select('*').order('rank');
   const me = (lb||[]).find(r => r.id === currentUser.id);
   const rank = me ? me.rank : '—';
 
-  document.getElementById('stat-rank').textContent    = '#' + rank;
-  document.getElementById('lb-me-pts').textContent    = totalPts;
-  document.getElementById('lb-me-name').textContent   = currentUser.name + ' (אתה)';
-  document.getElementById('lb-me-avatar').textContent = currentUser.name[0];
+  document.getElementById('stat-rank').textContent      = '#' + rank;
   document.getElementById('lb-class-label').textContent = 'כיתה ' + currentUser.cls;
+
+  const medals = ['🥇','🥈','🥉'];
+  const badges = ['🔥','⚡','⭐',''];
+  const rowsHtml = (lb||[]).slice(0,10).map((r, i) => {
+    const isMe = r.id === currentUser.id;
+    const rankLabel = i < 3 ? medals[i] : `<span style="font-size:15px;">${r.rank}</span>`;
+    const avatarStyle = isMe ? 'background:var(--blue);color:white;' : '';
+    const rowClass = ['lb-row', i===0?'top-1':i===1?'top-2':i===2?'top-3':'', isMe?'me':''].filter(Boolean).join(' ');
+    const nameLabel = isMe ? r.name + ' (אתה)' : r.name;
+    const ptsStyle = isMe ? 'style="color:var(--blue);"' : '';
+    return `<div class="${rowClass}">
+      <div class="lb-rank">${rankLabel}</div>
+      <div class="lb-name"><div class="lb-avatar" style="${avatarStyle}">${r.name[0]}</div>${nameLabel}</div>
+      <div class="lb-points" ${ptsStyle}>${r.total_points}</div>
+      <div class="lb-badge">${badges[i]||''}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('lb-rows').innerHTML = rowsHtml ||
+    '<div style="padding:20px;text-align:center;color:var(--text-soft);font-size:14px;">אין תלמידים עדיין</div>';
 
   document.getElementById('profile-name').textContent   = currentUser.name;
   document.getElementById('profile-avatar').textContent = currentUser.name[0];
