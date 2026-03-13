@@ -8,96 +8,72 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="sq-styles.css">
 <style>
-/* ── Landing ─────────────────────────────────────────── */
-body.landing-page { background: var(--navy); }
-.stars-bg {
-  position: fixed; inset: 0; pointer-events: none;
-  background-image:
-    radial-gradient(circle at 20% 30%, rgba(245,197,24,0.08) 0%, transparent 50%),
-    radial-gradient(circle at 80% 70%, rgba(45,107,228,0.15) 0%, transparent 50%);
-}
-.star-dots {
-  position: fixed; inset: 0; pointer-events: none;
-  background-image:
-    radial-gradient(1.5px 1.5px at 10% 15%, rgba(255,255,255,0.6) 0%, transparent 100%),
-    radial-gradient(1px 1px at 25% 40%, rgba(255,255,255,0.4) 0%, transparent 100%),
-    radial-gradient(2px 2px at 60% 10%, rgba(245,197,24,0.8) 0%, transparent 100%),
-    radial-gradient(1px 1px at 75% 55%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 85% 25%, rgba(255,255,255,0.4) 0%, transparent 100%),
-    radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,0.3) 0%, transparent 100%),
-    radial-gradient(2px 2px at 90% 80%, rgba(245,197,24,0.6) 0%, transparent 100%),
-    radial-gradient(1px 1px at 15% 85%, rgba(255,255,255,0.4) 0%, transparent 100%),
-    radial-gradient(1px 1px at 30% 90%, rgba(245,197,24,0.5) 0%, transparent 100%);
-}
+.screen { display:none; min-height:100vh; }
+.screen.active { display:flex; flex-direction:column; }
 
-/* Page system */
-.page { display: none; }
-.page.active { display: block; }
-#page-landing.active { display: flex; flex-direction: column; min-height: 100vh; }
+/* LANDING */
+#screen-landing { background:var(--navy); position:relative; overflow:hidden; align-items:stretch; }
+.stars-bg { position:absolute; inset:0; background-image: radial-gradient(circle at 20% 30%, rgba(245,197,24,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(45,107,228,0.15) 0%, transparent 50%); pointer-events:none; }
+.star-dots { position:absolute; inset:0; pointer-events:none; background-image: radial-gradient(1.5px 1.5px at 10% 15%, rgba(255,255,255,0.6) 0%, transparent 100%), radial-gradient(1px 1px at 25% 40%, rgba(255,255,255,0.4) 0%, transparent 100%), radial-gradient(2px 2px at 60% 10%, rgba(245,197,24,0.8) 0%, transparent 100%), radial-gradient(1px 1px at 75% 55%, rgba(255,255,255,0.5) 0%, transparent 100%), radial-gradient(1.5px 1.5px at 85% 25%, rgba(255,255,255,0.4) 0%, transparent 100%), radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,0.3) 0%, transparent 100%), radial-gradient(2px 2px at 90% 80%, rgba(245,197,24,0.6) 0%, transparent 100%), radial-gradient(1px 1px at 15% 85%, rgba(255,255,255,0.4) 0%, transparent 100%); }
+.landing-nav { position:relative; z-index:10; display:flex; align-items:center; justify-content:space-between; padding:24px 48px; }
+.logo { font-size:22px; font-weight:900; color:white; }
+.logo span { color:var(--gold); }
+.hero { flex:1; display:flex; align-items:center; justify-content:center; flex-direction:column; text-align:center; padding:60px 24px; position:relative; z-index:1; }
+.hero-badge { display:inline-block; background:rgba(245,197,24,0.15); border:1px solid rgba(245,197,24,0.3); color:var(--gold); font-size:13px; font-weight:800; padding:6px 18px; border-radius:100px; margin-bottom:24px; }
+.hero h1 { font-size:clamp(36px,6vw,64px); font-weight:900; color:white; line-height:1.1; margin-bottom:20px; }
+.hero h1 span { color:var(--gold); }
+.hero-sub { font-size:18px; color:rgba(255,255,255,0.65); max-width:480px; line-height:1.6; margin-bottom:40px; }
+.hero-actions { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:13px 28px; border-radius:var(--radius); font-family:'Heebo',sans-serif; font-size:16px; font-weight:800; border:none; cursor:pointer; transition:all 0.2s; }
+.btn-primary { background:var(--gold); color:var(--navy); box-shadow:0 4px 20px rgba(245,197,24,0.35); }
+.btn-primary:hover { background:var(--gold-dark); transform:translateY(-2px); }
+.btn-blue { background:var(--blue); color:white; }
+.btn-blue:hover { background:var(--blue-dark); transform:translateY(-2px); }
+.btn-outline { background:transparent; border:2px solid rgba(255,255,255,0.3); color:white; }
+.btn-outline:hover { background:rgba(255,255,255,0.1); }
+.btn-full { width:100%; }
+.features { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; max-width:700px; margin:60px auto 0; padding:0 24px; position:relative; z-index:1; }
+.feature-card { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:24px; text-align:center; }
+.feature-icon { font-size:32px; margin-bottom:12px; }
+.feature-title { font-size:15px; font-weight:800; color:white; margin-bottom:6px; }
+.feature-desc { font-size:13px; color:rgba(255,255,255,0.5); line-height:1.5; }
+.landing-footer { text-align:center; padding:32px; color:rgba(255,255,255,0.25); font-size:12px; position:relative; z-index:1; }
 
-.landing-nav {
-  position: relative; z-index: 10;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 24px 48px;
-}
-.logo { font-size: 22px; font-weight: 900; color: white; }
-.logo span { color: var(--gold); }
+/* AUTH */
+#screen-signup, #screen-login { align-items:center; justify-content:center; background:var(--bg); }
+.auth-card { background:white; border-radius:20px; padding:40px; width:100%; max-width:420px; box-shadow:var(--shadow-lg); margin:24px; }
+.auth-logo { text-align:center; font-size:22px; font-weight:900; color:var(--navy); margin-bottom:8px; }
+.auth-title { font-size:22px; font-weight:900; color:var(--navy); margin-bottom:6px; text-align:center; }
+.auth-sub { font-size:14px; color:var(--text-soft); text-align:center; margin-bottom:28px; }
+.form-group { margin-bottom:18px; }
+.form-label { display:block; font-size:13px; font-weight:800; color:var(--navy); margin-bottom:7px; }
+.form-input, .form-select { width:100%; padding:12px 14px; border:2px solid var(--border); border-radius:10px; font-family:'Heebo',sans-serif; font-size:15px; color:var(--text); outline:none; transition:all 0.2s; background:white; }
+.form-input:focus, .form-select:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(45,107,228,0.12); }
+.form-error { font-size:12px; color:var(--error); font-weight:700; margin-top:5px; }
+.divider { text-align:center; color:var(--text-soft); font-size:13px; font-weight:700; margin:18px 0; position:relative; }
+.divider::before, .divider::after { content:''; position:absolute; top:50%; width:42%; height:1px; background:var(--border); }
+.divider::before { right:0; } .divider::after { left:0; }
+.auth-switch { text-align:center; font-size:13px; color:var(--text-soft); margin-top:14px; }
+.auth-switch a { color:var(--blue); font-weight:800; cursor:pointer; }
 
-.hero {
-  flex: 1; display: flex; align-items: center; justify-content: center;
-  flex-direction: column; text-align: center; padding: 60px 24px;
-  position: relative; z-index: 1;
-}
-.hero-badge {
-  display: inline-block;
-  background: rgba(245,197,24,0.15); border: 1px solid rgba(245,197,24,0.3);
-  color: var(--gold); font-size: 13px; font-weight: 800;
-  padding: 6px 18px; border-radius: 100px; margin-bottom: 24px;
-}
-.hero h1 {
-  font-size: clamp(36px, 6vw, 64px); font-weight: 900; color: white;
-  line-height: 1.1; margin-bottom: 20px;
-}
-.hero h1 span { color: var(--gold); }
-.hero-sub { font-size: 18px; color: rgba(255,255,255,0.65); max-width: 480px; line-height: 1.6; margin-bottom: 40px; }
-.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
-
-.features {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
-  max-width: 700px; margin: 60px auto 0; padding: 0 24px;
-  position: relative; z-index: 1;
-}
-.feature-card {
-  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 16px; padding: 24px; text-align: center;
-}
-.feature-icon { font-size: 32px; margin-bottom: 12px; }
-.feature-title { font-size: 15px; font-weight: 800; color: white; margin-bottom: 6px; }
-.feature-desc { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.5; }
-.landing-footer { text-align: center; padding: 32px; color: rgba(255,255,255,0.25); font-size: 12px; position: relative; z-index: 1; }
-
-/* Auth pages override */
-#page-signup, #page-login { min-height: 100vh; display: none; align-items: center; justify-content: center; background: var(--bg); }
-#page-signup.active, #page-login.active { display: flex; }
-
-@media (max-width: 768px) {
-  .landing-nav { padding: 16px 24px; }
-  .hero { padding: 40px 24px; }
-  .features { grid-template-columns: 1fr; }
+@media(max-width:768px) {
+  .features { grid-template-columns:1fr; }
+  .landing-nav { padding:16px 24px; }
+  .hero { padding:40px 24px; }
 }
 </style>
 </head>
-<body class="landing-page">
-<div class="stars-bg"></div>
-<div class="star-dots"></div>
+<body>
 
-<!-- ── Landing ────────────────────────────────────────── -->
-<div id="page-landing" class="page active">
+<!-- LANDING -->
+<div id="screen-landing" class="screen active">
+  <div class="stars-bg"></div>
+  <div class="star-dots"></div>
   <nav class="landing-nav">
     <div class="logo">⭐ סטאר<span>קווסט</span></div>
     <div style="display:flex;gap:10px;">
-      <button class="btn btn-outline" style="padding:10px 20px;font-size:14px;" onclick="showPage('login')">כניסה</button>
-      <button class="btn btn-primary" style="padding:10px 20px;font-size:14px;" onclick="showPage('signup')">הצטרף חינם</button>
+      <button class="btn btn-outline" style="padding:10px 20px;font-size:14px;" onclick="showScreen('login')">כניסה</button>
+      <button class="btn btn-primary" style="padding:10px 20px;font-size:14px;" onclick="showScreen('signup')">הצטרף חינם</button>
     </div>
   </nav>
   <div class="hero">
@@ -105,7 +81,7 @@ body.landing-page { background: var(--navy); }
     <h1>למד. הרוויח. <span>גדל.</span></h1>
     <p class="hero-sub">צבור נקודות, פתח עיטורים ועלה בדירוג הכיתה — על ידי לימוד אמיתי.</p>
     <div class="hero-actions">
-      <button class="btn btn-primary" onclick="showPage('signup')">🚀 התחל עכשיו — חינם</button>
+      <button class="btn btn-primary" onclick="showScreen('signup')">🚀 התחל עכשיו — חינם</button>
       <button class="btn btn-outline" onclick="demoLogin()">👀 כניסת דמו</button>
     </div>
   </div>
@@ -117,16 +93,17 @@ body.landing-page { background: var(--navy); }
   <div class="landing-footer">סטארקווסט © 2026 · בטא · כיתה ד׳</div>
 </div>
 
-<!-- ── Signup ──────────────────────────────────────────── -->
-<div id="page-signup" class="page">
-  <div class="auth-card">
+<!-- SIGNUP -->
+<div id="screen-signup" class="screen">
+  <div class="auth-card fadein">
     <div class="auth-logo">⭐ סטארקווסט</div>
     <h2 class="auth-title">צור חשבון חדש</h2>
     <p class="auth-sub">הצטרף ותתחיל לצבור כוכבים! ⭐</p>
     <div class="form-group">
       <label class="form-label">השם שלך</label>
-      <input type="text" class="form-input" id="signup-name" placeholder="הזן את שמך הפרטי">
-      <div class="form-error" id="err-name">נא להזין שם</div>
+      <input type="text" class="form-input" id="signup-name" placeholder="הזן את שמך הפרטי"
+        onkeydown="if(event.key==='Enter') doSignup()" />
+      <div class="form-error" id="err-name" style="display:none;"></div>
     </div>
     <div class="form-group">
       <label class="form-label">הכיתה שלך</label>
@@ -137,113 +114,148 @@ body.landing-page { background: var(--navy); }
         <option value="ד3">כיתה ד׳3</option>
         <option value="ה1">כיתה ה׳1</option>
       </select>
-      <div class="form-error" id="err-class">נא לבחור כיתה</div>
+      <div class="form-error" id="err-class" style="display:none;"></div>
     </div>
     <div class="form-group">
       <label class="form-label">סיסמה</label>
-      <input type="password" class="form-input" id="signup-pass" placeholder="בחר סיסמה (4+ תווים)">
-      <div class="form-error" id="err-pass">הסיסמה חייבת להכיל לפחות 4 תווים</div>
+      <input type="password" class="form-input" id="signup-pass" placeholder="בחר סיסמה (4+ תווים)" />
+      <div class="form-error" id="err-pass" style="display:none;"></div>
     </div>
     <div class="form-group">
       <label class="form-label">אימות סיסמה</label>
-      <input type="password" class="form-input" id="signup-pass2" placeholder="חזור על הסיסמה">
-      <div class="form-error" id="err-pass2">הסיסמאות אינן תואמות</div>
+      <input type="password" class="form-input" id="signup-pass2" placeholder="חזור על הסיסמה"
+        onkeydown="if(event.key==='Enter') doSignup()" />
+      <div class="form-error" id="err-pass2" style="display:none;"></div>
     </div>
-    <button class="btn btn-primary btn-full" onclick="doSignup()">🚀 צור חשבון</button>
-    <div class="auth-switch">כבר יש לך חשבון? <a onclick="showPage('login')">התחבר כאן</a></div>
-    <div class="auth-switch" style="margin-top:8px;"><a onclick="showPage('landing')" style="color:var(--text-soft);">← חזרה</a></div>
+    <button class="btn btn-primary btn-full" id="btn-signup" onclick="doSignup()">🚀 צור חשבון</button>
+    <div class="auth-switch">כבר יש לך חשבון? <a onclick="showScreen('login')">התחבר כאן</a></div>
+    <div class="auth-switch" style="margin-top:8px;"><a onclick="showScreen('landing')" style="color:var(--text-soft);">← חזרה</a></div>
   </div>
 </div>
 
-<!-- ── Login ───────────────────────────────────────────── -->
-<div id="page-login" class="page">
-  <div class="auth-card">
+<!-- LOGIN -->
+<div id="screen-login" class="screen">
+  <div class="auth-card fadein">
     <div class="auth-logo">⭐ סטארקווסט</div>
     <h2 class="auth-title">ברוך הבא חזרה!</h2>
     <p class="auth-sub">התחבר וממשיך לצבור כוכבים ⭐</p>
     <div class="form-group">
       <label class="form-label">השם שלך</label>
-      <input type="text" class="form-input" id="login-name" placeholder="הזן את שמך">
+      <input type="text" class="form-input" id="login-name" placeholder="הזן את שמך" />
     </div>
     <div class="form-group">
       <label class="form-label">סיסמה</label>
-      <input type="password" class="form-input" id="login-pass" placeholder="הזן סיסמה">
+      <input type="password" class="form-input" id="login-pass" placeholder="הזן סיסמה"
+        onkeydown="if(event.key==='Enter') doLogin()" />
     </div>
-    <div class="form-error" id="err-login" style="display:block;margin-bottom:14px;"></div>
-    <button class="btn btn-primary btn-full" onclick="doLogin()">⭐ כניסה</button>
+    <div class="form-error" id="err-login" style="display:none;margin-bottom:14px;"></div>
+    <button class="btn btn-primary btn-full" id="btn-login" onclick="doLogin()">⭐ כניסה</button>
     <div class="divider">או</div>
     <button class="btn btn-blue btn-full" onclick="demoLogin()">👀 כניסת דמו — ללא חשבון</button>
-    <div class="auth-switch" style="margin-top:16px;">משתמש חדש? <a onclick="showPage('signup')">צור חשבון</a></div>
-    <div class="auth-switch" style="margin-top:8px;"><a onclick="showPage('landing')" style="color:var(--text-soft);">← חזרה</a></div>
+    <div class="auth-switch" style="margin-top:16px;">משתמש חדש? <a onclick="showScreen('signup')">צור חשבון</a></div>
+    <div class="auth-switch" style="margin-top:8px;"><a onclick="showScreen('landing')" style="color:var(--text-soft);">← חזרה</a></div>
   </div>
 </div>
 
 <script src="sq-core.js"></script>
 <script>
-// If already logged in, go straight to dashboard
-if (getSession()) {
-  window.location.href = 'app.html';
+
+// ── On page load: if already logged in, go straight to app ─
+window.addEventListener('load', () => {
+  const session = getSession();
+  if (session) window.location.href = 'app.html';
+});
+
+// ── Screen navigation ──────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  window.scrollTo(0, 0);
 }
 
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  document.body.style.background = (name === 'landing') ? '' : 'var(--bg)';
-}
-
+// ── Signup ─────────────────────────────────────────────────
 async function doSignup() {
   const name  = document.getElementById('signup-name').value.trim();
   const cls   = document.getElementById('signup-class').value;
   const pass  = document.getElementById('signup-pass').value;
   const pass2 = document.getElementById('signup-pass2').value;
 
-  document.getElementById('err-name').style.display  = (!name)           ? 'block' : 'none';
-  document.getElementById('err-class').style.display = (!cls)            ? 'block' : 'none';
-  document.getElementById('err-pass').style.display  = (pass.length < 4) ? 'block' : 'none';
-  document.getElementById('err-pass2').style.display = (pass !== pass2)  ? 'block' : 'none';
-  if (!name || !cls || pass.length < 4 || pass !== pass2) return;
+  // Reset errors
+  ['err-name','err-class','err-pass','err-pass2'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
 
+  let valid = true;
+  if (!name)           { showErr('err-name',  'נא להזין שם');                              valid = false; }
+  if (!cls)            { showErr('err-class', 'נא לבחור כיתה');                            valid = false; }
+  if (pass.length < 4) { showErr('err-pass',  'הסיסמה חייבת להכיל לפחות 4 תווים');        valid = false; }
+  if (pass !== pass2)  { showErr('err-pass2', 'הסיסמאות אינן תואמות');                    valid = false; }
+  if (!valid) return;
+
+  setLoading('btn-signup', true);
   showLoading('יוצר חשבון...');
+
   try {
     const { data: existing } = await sb.from('users').select('id').ilike('name', name).maybeSingle();
     if (existing) {
-      document.getElementById('err-name').textContent = 'שם זה כבר קיים — נסה להתחבר';
-      document.getElementById('err-name').style.display = 'block';
-      hideLoading(); return;
+      showErr('err-name', 'שם זה כבר קיים — נסה להתחבר');
+      hideLoading();
+      setLoading('btn-signup', false);
+      return;
     }
     const hash = await hashPass(pass);
     const { data: user, error } = await sb.from('users')
       .insert({ name, class: cls, password_hash: hash })
       .select().single();
     if (error) throw error;
-    await completeLogin(user);
+    await finishLogin(user);
   } catch(e) {
-    document.getElementById('err-name').textContent = 'שגיאה: ' + e.message;
-    document.getElementById('err-name').style.display = 'block';
+    showErr('err-name', 'שגיאה: ' + e.message);
+    hideLoading();
+    setLoading('btn-signup', false);
   }
-  hideLoading();
 }
 
+// ── Login ──────────────────────────────────────────────────
 async function doLogin() {
   const name  = document.getElementById('login-name').value.trim();
   const pass  = document.getElementById('login-pass').value;
   const errEl = document.getElementById('err-login');
-  if (!name || !pass) { errEl.textContent = '⚠️ נא למלא שם וסיסמה'; return; }
+  errEl.style.display = 'none';
 
-  showLoading('מתחבר...');
-  try {
-    const { data: user } = await sb.from('users').select('*').ilike('name', name).maybeSingle();
-    if (!user) { errEl.textContent = '⚠️ שם לא נמצא — נסה כניסת דמו!'; hideLoading(); return; }
-    const hash = await hashPass(pass);
-    if (user.password_hash !== hash) { errEl.textContent = '⚠️ סיסמה שגויה'; hideLoading(); return; }
-    errEl.textContent = '';
-    await completeLogin(user);
-  } catch(e) {
-    errEl.textContent = 'שגיאה: ' + e.message;
+  if (!name || !pass) {
+    showErr('err-login', '⚠️ נא למלא שם וסיסמה');
+    return;
   }
-  hideLoading();
+
+  setLoading('btn-login', true);
+  showLoading('מתחבר...');
+
+  try {
+    const { data: user, error } = await sb.from('users').select('*').ilike('name', name).maybeSingle();
+    if (error) throw error;
+    if (!user) {
+      showErr('err-login', '⚠️ שם לא נמצא — בדוק שם או צור חשבון חדש');
+      hideLoading();
+      setLoading('btn-login', false);
+      return;
+    }
+    const hash = await hashPass(pass);
+    if (user.password_hash !== hash) {
+      showErr('err-login', '⚠️ סיסמה שגויה');
+      hideLoading();
+      setLoading('btn-login', false);
+      return;
+    }
+    await finishLogin(user);
+  } catch(e) {
+    showErr('err-login', 'שגיאה: ' + e.message);
+    hideLoading();
+    setLoading('btn-login', false);
+  }
 }
 
+// ── Demo login ─────────────────────────────────────────────
 async function demoLogin() {
   showLoading('טוען דמו...');
   try {
@@ -258,36 +270,57 @@ async function demoLogin() {
       await sb.from('progress').upsert({
         user_id: user.id, topic_id: 'noshe7',
         score: 85, stars: 2, points: 85, attempts: 1
-      });
+      }, { onConflict: 'user_id,topic_id' });
     }
-    await completeLogin({ ...user, name: 'דניאל' });
+    // Show as דניאל in the app
+    await finishLogin({ ...user, name: 'דניאל' });
   } catch(e) {
     hideLoading();
-    alert('שגיאה בכניסת דמו: ' + e.message);
+    showErr('err-login', 'שגיאה בכניסת דמו: ' + e.message);
+    showScreen('login');
   }
 }
 
-async function completeLogin(user) {
-  const progress = await loadProgress(user.id);
-  const { totalPoints } = computeTotals(progress);
+// ── Shared: finish login → save session → redirect ─────────
+async function finishLogin(user) {
+  try {
+    const progress = await loadProgress(user.id);
+    const { totalPoints } = computeTotals(progress);
 
-  saveSession({
-    id:     user.id,
-    name:   user.name,
-    cls:    user.class,
-    points: totalPoints
-  });
+    saveSession({
+      id:     user.id,
+      name:   user.name,
+      cls:    user.class,
+      points: totalPoints
+    });
 
-  sb.from('sessions').insert({ user_id: user.id }).then(() => {});
-  hideLoading();
-  window.location.href = 'app.html';
+    // Log session — fire and forget
+    sb.from('sessions').insert({ user_id: user.id }).then(() => {});
+
+    window.location.href = 'app.html';
+  } catch(e) {
+    hideLoading();
+    showErr('err-login', 'שגיאת התחברות: ' + e.message);
+    showScreen('login');
+  }
 }
 
-// Enter key support
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-  document.getElementById('signup-pass2').addEventListener('keydown', e => { if (e.key === 'Enter') doSignup(); });
-});
+// ── Helpers ─────────────────────────────────────────────────
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = loading;
+  if (loading) btn.style.opacity = '0.6';
+  else btn.style.opacity = '1';
+}
+
 </script>
 </body>
 </html>
