@@ -47,7 +47,6 @@
 .stars-banner-left { display: flex; align-items: center; gap: 12px; }
 .stars-total { font-size: 26px; font-weight: 900; color: var(--gold-dark); }
 
-/* Map nodes */
 .connector {
   width: 3px; height: 40px; margin: 0 auto; position: relative; z-index: 0;
   transition: background 0.4s; background: var(--border);
@@ -100,7 +99,6 @@
   padding: 24px; text-align: center; margin-top: 32px; color: var(--locked); font-weight: 700; font-size: 14px;
 }
 
-/* Modal */
 .lm-modal-overlay {
   display: none; position: fixed; inset: 0; background: rgba(26,26,46,0.7);
   z-index: 200; align-items: center; justify-content: center; padding: 24px;
@@ -196,14 +194,15 @@
 const session = requireAuth();
 let progress = {};
 
+// ── Topic order: noshe1 → noshe7 (correct curriculum order) ──
 const LEVELS = [
-  { id:'noshe7', num:'נושא 7', title:'תכונות ה-0 וה-1',                             questions:20, minutes:15, worksheet:'worksheet.html?topic=noshe7' },
-  { id:'noshe6', num:'נושא 6', title:'סדר פעולות החשבון ושימוש בסוגריים',           questions:18, minutes:12, worksheet: null },
-  { id:'noshe5', num:'נושא 5', title:'הקשר בין כפל לבין חילוק',                     questions:16, minutes:10, worksheet: null },
-  { id:'noshe4', num:'נושא 4', title:'חילוק בעשרות שלמות ובמאות שלמות',            questions:20, minutes:12, worksheet: null },
-  { id:'noshe3', num:'נושא 3', title:'חילוק במחלק חד-ספרתי ב-10, ב-100 וב-1,000', questions:18, minutes:10, worksheet: null },
-  { id:'noshe2', num:'נושא 2', title:'כפל בעשרות שלמות ובמאות שלמות',              questions:20, minutes:12, worksheet: null },
-  { id:'noshe1', num:'נושא 1', title:'כפל ב-10, ב-100 וב-1,000',                   questions:18, minutes:10, worksheet: null },
+  { id:'noshe1', num:'נושא 1', title:'כפל ב-10, ב-100 וב-1,000',                    questions:24, minutes:15, worksheet:'worksheet.html?topic=noshe1' },
+  { id:'noshe2', num:'נושא 2', title:'כפל בעשרות שלמות, במאות שלמות ובאלפים שלמים', questions:26, minutes:15, worksheet:'worksheet.html?topic=noshe2' },
+  { id:'noshe3', num:'נושא 3', title:'חילוק במחלק חד-ספרתי ב-10, ב-100 וב-1,000',  questions:18, minutes:10, worksheet: null },
+  { id:'noshe4', num:'נושא 4', title:'חילוק בעשרות שלמות ובמאות שלמות',             questions:20, minutes:12, worksheet: null },
+  { id:'noshe5', num:'נושא 5', title:'הקשר בין כפל לבין חילוק',                      questions:16, minutes:10, worksheet: null },
+  { id:'noshe6', num:'נושא 6', title:'סדר פעולות החשבון ושימוש בסוגריים',            questions:18, minutes:12, worksheet: null },
+  { id:'noshe7', num:'נושא 7', title:'תכונות ה-0 וה-1',                              questions:20, minutes:15, worksheet:'worksheet.html?topic=noshe7' },
 ];
 
 function getLevelState(levelId) {

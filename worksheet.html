@@ -65,6 +65,8 @@
 .answer-input:disabled { background: var(--bg); cursor: default; }
 .q-box.correct .answer-input { border-color: var(--success); background: var(--success-bg); color: var(--success); }
 .q-box.wrong   .answer-input { border-color: var(--error);   background: var(--error-bg);   color: var(--error); }
+.q-box.correct .compare-input { border-color: var(--success); background: var(--success-bg); color: var(--success); }
+.q-box.wrong   .compare-input { border-color: var(--error);   background: var(--error-bg);   color: var(--error); }
 
 .compare-row { display: flex; align-items: center; justify-content: center; gap: 10px; direction: ltr; }
 .compare-sides { font-size: 18px; font-weight: 800; color: var(--navy); white-space: nowrap; }
@@ -75,8 +77,6 @@
 }
 .compare-input:focus { border-color: var(--blue-dark); box-shadow: 0 0 0 3px rgba(45,107,228,0.15); }
 .compare-input:disabled { background: var(--bg); cursor: default; }
-.q-box.correct .compare-input { border-color: var(--success); background: var(--success-bg); color: var(--success); }
-.q-box.wrong   .compare-input { border-color: var(--error);   background: var(--error-bg);   color: var(--error); }
 .correct-answer { font-size: 12px; color: var(--error); font-weight: 700; margin-top: 6px; text-align: center; display: none; direction: rtl; }
 .q-box.wrong .correct-answer { display: block; }
 
@@ -186,12 +186,134 @@
 
 <script src="sq-core.js"></script>
 <script>
-// ── Topic data ────────────────────────────────────────────
-// Each topic defines: id, title, chapter, badges[], sections[]
-// Each section: { title, subtitle, questions[] }
-// Each question: { id, type:'num'|'cmp'|'txt', left?, right?, expr?, answer }
+// ══════════════════════════════════════════════════════════
+// TOPICS — add new topics here. Each topic is one object.
+// id, title, chapter, ptsPerQ, sections[]
+// section: { title, subtitle, questions[] }
+// question: { id, type:'num'|'cmp'|'txt', expr[] or left+right, answer, acceptAlso? }
+// ══════════════════════════════════════════════════════════
 
 const TOPICS = {
+
+  // ── נושא 1: כפל ב-10, ב-100 וב-1,000 ────────────────────
+  noshe1: {
+    id: 'noshe1',
+    title: 'כפל ב-10, ב-100 וב-1,000',
+    chapter: 'פרק א׳',
+    ptsPerQ: 5,
+    sections: [
+      {
+        title: 'פתרו את התרגילים.',
+        subtitle: 'כפל ב-100',
+        questions: [
+          { id:'n1q1',  type:'num', expr:['8 × 100 =', '__'],   answer:'800' },
+          { id:'n1q2',  type:'num', expr:['27 × 100 =', '__'],  answer:'2700' },
+          { id:'n1q3',  type:'num', expr:['6 × 100 =', '__'],   answer:'600' },
+          { id:'n1q4',  type:'num', expr:['16 × 100 =', '__'],  answer:'1600' },
+          { id:'n1q5',  type:'num', expr:['72 × 100 =', '__'],  answer:'7200' },
+          { id:'n1q6',  type:'num', expr:['100 × 58 =', '__'],  answer:'5800' },
+          { id:'n1q7',  type:'num', expr:['100 × 226 =', '__'], answer:'22600' },
+          { id:'n1q8',  type:'num', expr:['100 × 591 =', '__'], answer:'59100' },
+        ]
+      },
+      {
+        title: 'פתרו את התרגילים.',
+        subtitle: 'כפל ב-1,000',
+        questions: [
+          { id:'n1q9',  type:'num', expr:['8 × 1,000 =', '__'],     answer:'8000' },
+          { id:'n1q10', type:'num', expr:['27 × 1,000 =', '__'],    answer:'27000' },
+          { id:'n1q11', type:'num', expr:['51 × 1,000 =', '__'],    answer:'51000' },
+          { id:'n1q12', type:'num', expr:['1,000 × 39 =', '__'],    answer:'39000' },
+          { id:'n1q13', type:'num', expr:['1,000 × 226 =', '__'],   answer:'226000' },
+          { id:'n1q14', type:'num', expr:['1,000 × 591 =', '__'],   answer:'591000' },
+        ]
+      },
+      {
+        title: 'פתרו את התרגילים.',
+        subtitle: 'כפל ב-10, ב-100 וב-1,000 — תרגול משולב',
+        questions: [
+          { id:'n1q15', type:'num', expr:['9 × 1,000 =', '__'],    answer:'9000' },
+          { id:'n1q16', type:'num', expr:['100 × 23 =', '__'],     answer:'2300' },
+          { id:'n1q17', type:'num', expr:['40 × 100 =', '__'],     answer:'4000' },
+          { id:'n1q18', type:'num', expr:['10 × 35 =', '__'],      answer:'350' },
+          { id:'n1q19', type:'num', expr:['99 × 10 =', '__'],      answer:'990' },
+          { id:'n1q20', type:'num', expr:['1,000 × 37 =', '__'],   answer:'37000' },
+        ]
+      },
+      {
+        title: 'בלי לחשב, סמנו <, > או =',
+        subtitle: 'השוו בין הביטויים',
+        questions: [
+          { id:'n1q21', type:'cmp', left:'28 × 10 × 10', right:'1,000 × 28', answer:'<' },
+          { id:'n1q22', type:'cmp', left:'10 × 10 × 17', right:'17 × 100',   answer:'=' },
+          { id:'n1q23', type:'cmp', left:'50 × 100',      right:'5 × 10 × 10', answer:'>' },
+          { id:'n1q24', type:'cmp', left:'89 × 100 × 10', right:'1,000 × 99', answer:'<' },
+        ]
+      }
+    ]
+  },
+
+  // ── נושא 2: כפל בעשרות שלמות, במאות שלמות ובאלפים שלמים ──
+  noshe2: {
+    id: 'noshe2',
+    title: 'כפל בעשרות שלמות, במאות שלמות ובאלפים שלמים',
+    chapter: 'פרק א׳',
+    ptsPerQ: 5,
+    sections: [
+      {
+        title: 'פתרו את התרגילים.',
+        subtitle: 'כפל בעשרות שלמות',
+        questions: [
+          { id:'n2q1', type:'num', expr:['9 × 60 =', '__'],   answer:'540' },
+          { id:'n2q2', type:'num', expr:['8 × 40 =', '__'],   answer:'320' },
+          { id:'n2q3', type:'num', expr:['4 × 90 =', '__'],   answer:'360' },
+          { id:'n2q4', type:'num', expr:['12 × 70 =', '__'],  answer:'840' },
+          { id:'n2q5', type:'num', expr:['21 × 50 =', '__'],  answer:'1050' },
+          { id:'n2q6', type:'num', expr:['20 × 7 =', '__'],   answer:'140' },
+          { id:'n2q7', type:'num', expr:['30 × 13 =', '__'],  answer:'390' },
+        ]
+      },
+      {
+        title: 'פתרו את התרגילים.',
+        subtitle: 'כפל במאות שלמות ובאלפים שלמים',
+        questions: [
+          { id:'n2q8',  type:'num', expr:['4 × 800 =', '__'],   answer:'3200' },
+          { id:'n2q9',  type:'num', expr:['9 × 600 =', '__'],   answer:'5400' },
+          { id:'n2q10', type:'num', expr:['5 × 900 =', '__'],   answer:'4500' },
+          { id:'n2q11', type:'num', expr:['7 × 700 =', '__'],   answer:'4900' },
+          { id:'n2q12', type:'num', expr:['18 × 200 =', '__'],  answer:'3600' },
+          { id:'n2q13', type:'num', expr:['16 × 500 =', '__'],  answer:'8000' },
+          { id:'n2q14', type:'num', expr:['200 × 6 =', '__'],   answer:'1200' },
+          { id:'n2q15', type:'num', expr:['300 × 3 =', '__'],   answer:'900' },
+        ]
+      },
+      {
+        title: 'פתרו את התרגילים.',
+        subtitle: 'כפל של עשרות בעשרות ובמאות',
+        questions: [
+          { id:'n2q16', type:'num', expr:['50 × 70 =', '__'],   answer:'3500' },
+          { id:'n2q17', type:'num', expr:['60 × 60 =', '__'],   answer:'3600' },
+          { id:'n2q18', type:'num', expr:['30 × 40 =', '__'],   answer:'1200' },
+          { id:'n2q19', type:'num', expr:['90 × 80 =', '__'],   answer:'7200' },
+          { id:'n2q20', type:'num', expr:['20 × 300 =', '__'],  answer:'6000' },
+          { id:'n2q21', type:'num', expr:['30 × 400 =', '__'],  answer:'12000' },
+        ]
+      },
+      {
+        title: 'בלי לחשב, סמנו <, > או =',
+        subtitle: 'השוו בין הביטויים',
+        questions: [
+          { id:'n2q22', type:'cmp', left:'100 × 78',      right:'780 × 10',     answer:'=' },
+          { id:'n2q23', type:'cmp', left:'590 × 10 × 1',  right:'59 × 10 × 10', answer:'=' },
+          { id:'n2q24', type:'cmp', left:'80 × 90 × 1',   right:'8 × 10 × 900', answer:'=' },
+          { id:'n2q25', type:'cmp', left:'60 × 30',        right:'18 × 100',     answer:'=' },
+          { id:'n2q26', type:'cmp', left:'70 × 50',        right:'35 × 1,000',   answer:'<' },
+        ]
+      }
+    ]
+  },
+
+  // ── נושא 7: תכונות ה-0 וה-1 ──────────────────────────────
   noshe7: {
     id:      'noshe7',
     title:   'תכונות ה-0 וה-1',
@@ -250,17 +372,17 @@ const TOPICS = {
       }
     ]
   }
-  // Add more topics here as needed:
-  // noshe6: { ... }
+
+  // ── Add Topics 3–6 here when ready ───────────────────────
 };
 
 // ── State ─────────────────────────────────────────────────
 const session = requireAuth();
 const params  = new URLSearchParams(window.location.search);
-const topicId = params.get('topic') || 'noshe7';
+const topicId = params.get('topic') || 'noshe1';
 const topic   = TOPICS[topicId];
 let wsSubmitted = false;
-let allQuestions = []; // flat list of all questions in order
+let allQuestions = [];
 
 // ── Render worksheet ──────────────────────────────────────
 function buildWorksheet() {
@@ -269,7 +391,6 @@ function buildWorksheet() {
     return;
   }
 
-  // Header
   document.title = `סטארקווסט — ${topic.title}`;
   document.getElementById('ws-title-big').textContent = topic.title;
   document.getElementById('ws-meta-row').innerHTML = `
@@ -277,7 +398,6 @@ function buildWorksheet() {
     <span class="ws-badge">חשבון</span>
     <span class="ws-badge">${topic.id.replace('noshe','נושא ')}</span>`;
 
-  // Build questions HTML
   const letters = 'אבגדהוזחטי'.split('');
   let qIndex = 0;
   let html = '';
@@ -311,7 +431,6 @@ function buildWorksheet() {
             <div class="correct-answer" id="ca-${q.id}"></div>
           </div>`;
       } else {
-        // Build expression with input in place of '__'
         const parts = q.expr.map(part =>
           part === '__'
             ? `<input class="answer-input" id="inp-${q.id}" type="${q.type === 'txt' ? 'text' : 'number'}" placeholder="?" autocomplete="off">`
@@ -334,7 +453,6 @@ function buildWorksheet() {
   const total = allQuestions.length;
   document.getElementById('ws-progress-count').textContent = `0 / ${total}`;
 
-  // Attach input listeners
   allQuestions.forEach(q => {
     const el = document.getElementById('inp-' + q.id);
     if (el) el.addEventListener('input', updateProgress);
@@ -390,11 +508,9 @@ async function wsSubmit() {
   const pts   = correctCount * (topic.ptsPerQ || 5);
   const stars = score >= 100 ? 3 : score >= 80 ? 2 : score >= 60 ? 1 : 0;
 
-  // ✅ FIXED: Save to Supabase (was broken before — used old localStorage system)
   if (session) {
     const saved = await saveProgress(session.id, topicId, { stars, score, points: pts });
     if (saved) {
-      // Update session points
       const progress = await loadProgress(session.id);
       const { totalPoints } = computeTotals(progress);
       session.points = totalPoints;
@@ -403,14 +519,12 @@ async function wsSubmit() {
     }
   }
 
-  // Results panel
   const panel = document.getElementById('ws-results');
   panel.classList.add('show');
   document.getElementById('res-correct').textContent = correctCount;
   document.getElementById('res-points').textContent  = pts;
   document.getElementById('res-pct').textContent     = score + '%';
 
-  // Stars animation
   for (let i = 1; i <= 3; i++) {
     const el = document.getElementById('rstar' + i);
     el.classList.remove('earned');
