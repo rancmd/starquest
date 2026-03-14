@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>סטארקווסט — דפי עבודה</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="sq-styles.css">
+<style>
+.page-main { max-width: 900px; margin: 0 auto; padding: 36px 24px 80px; }
+
+/* Breadcrumb */
+.breadcrumb {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 700; color: var(--text-soft);
+  margin-bottom: 28px; flex-wrap: wrap;
+}
+.breadcrumb a { color: var(--text-soft); text-decoration: none; transition: color 0.15s; }
+.breadcrumb a:hover { color: var(--blue); }
+.breadcrumb .sep { color: var(--border); font-size: 16px; }
+.breadcrumb .current { color: var(--navy); font-weight: 800; }
+
+/* Page header */
+.page-header { margin-bottom: 32px; }
+.page-title { font-size: 26px; font-weight: 900; color: var(--navy); margin-bottom: 6px; }
+.page-sub { font-size: 14px; color: var(--text-soft); font-weight: 500; }
+
+/* Subject cards */
+.subjects-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.subject-card {
+  background: white; border-radius: 20px; padding: 28px 24px;
+  box-shadow: var(--shadow); border: 2px solid transparent;
+  cursor: pointer; transition: all 0.2s; text-align: center;
+  position: relative; overflow: hidden;
+}
+.subject-card:hover:not(.subject-locked) {
+  border-color: var(--blue); transform: translateY(-4px); box-shadow: var(--shadow-lg);
+}
+.subject-card.subject-locked { cursor: default; opacity: 0.7; }
+.subject-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+  border-radius: 20px 20px 0 0;
+}
+.subject-card.math::before   { background: var(--blue); }
+.subject-card.lang::before   { background: #16a34a; }
+.subject-card.science::before { background: #d97706; }
+.subject-icon { font-size: 48px; margin-bottom: 16px; line-height: 1; }
+.subject-name { font-size: 20px; font-weight: 900; color: var(--navy); margin-bottom: 8px; }
+.subject-desc { font-size: 13px; color: var(--text-soft); font-weight: 500; line-height: 1.5; margin-bottom: 16px; }
+.subject-meta {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 800; padding: 5px 14px;
+  border-radius: 100px; background: var(--bg); color: var(--text-soft);
+}
+.subject-card.math .subject-meta   { background: var(--blue-light); color: var(--blue); }
+.subject-card.lang .subject-meta   { background: #f0fdf4; color: #15803d; }
+.subject-card.science .subject-meta { background: #fef9c3; color: #a16207; }
+.coming-badge {
+  position: absolute; top: 16px; left: 16px;
+  background: var(--border); color: var(--text-soft);
+  font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 100px;
+}
+
+@media (max-width: 768px) {
+  .subjects-grid { grid-template-columns: 1fr; }
+  .page-main { padding: 20px 14px 60px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="nav-logo" href="app.html">⭐ סטאר<span>קווסט</span></a>
+  <div class="nav-links">
+    <button class="nav-link" onclick="window.location.href='app.html'">🏠 בית</button>
+    <button class="nav-link active">📝 דפי עבודה</button>
+    <button class="nav-link" onclick="window.location.href='app.html#leaderboard'">🏆 דירוג</button>
+    <button class="nav-link" onclick="window.location.href='app.html#profile'">👤 פרופיל</button>
+  </div>
+  <div class="nav-right">
+    <div class="nav-points" id="nav-points" onclick="window.location.href='app.html#leaderboard'" title="לחץ לדירוג">⭐ 0 נק׳</div>
+    <div class="nav-avatar" id="nav-avatar" onclick="window.location.href='app.html#profile'" title="לחץ לפרופיל">?</div>
+  </div>
+  <button class="hamburger" id="hamburger" onclick="toggleDrawer()" aria-label="תפריט">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-drawer" id="mobile-drawer">
+  <button class="nav-link" onclick="window.location.href='app.html'">🏠 בית</button>
+  <button class="nav-link active">📝 דפי עבודה</button>
+  <button class="nav-link" onclick="window.location.href='app.html#leaderboard'">🏆 דירוג</button>
+  <button class="nav-link" onclick="window.location.href='app.html#profile'">👤 פרופיל</button>
+</div>
+
+<div class="page-main">
+
+  <div class="breadcrumb">
+    <a href="app.html">🏠 לוח בקרה</a>
+    <span class="sep">›</span>
+    <span class="current">📝 דפי עבודה</span>
+  </div>
+
+  <div class="page-header">
+    <div class="page-title">בחר מקצוע</div>
+    <div class="page-sub">בחר מקצוע כדי לראות את הספרים והנושאים הזמינים</div>
+  </div>
+
+  <div class="subjects-grid">
+
+    <!-- Math -->
+    <div class="subject-card math" onclick="window.location.href='books.html?subject=math'">
+      <div class="subject-icon">📐</div>
+      <div class="subject-name">מתמטיקה</div>
+      <div class="subject-desc">חשבון, גאומטריה, שברים ועוד — לפי ספרי הלימוד של כיתה ד׳</div>
+      <div class="subject-meta">4 ספרים · 7+ נושאים פעילים</div>
+    </div>
+
+    <!-- Language -->
+    <div class="subject-card lang subject-locked">
+      <div class="coming-badge">בקרוב</div>
+      <div class="subject-icon">📖</div>
+      <div class="subject-name">עברית</div>
+      <div class="subject-desc">שפה ולשון, הבנת הנקרא, כתיבה יצירתית</div>
+      <div class="subject-meta">🔒 בשלב הפיתוח</div>
+    </div>
+
+    <!-- Science -->
+    <div class="subject-card science subject-locked">
+      <div class="coming-badge">בקרוב</div>
+      <div class="subject-icon">🔬</div>
+      <div class="subject-name">מדעים</div>
+      <div class="subject-desc">מדעי הטבע, חי וצומח, כדור הארץ והיקום</div>
+      <div class="subject-meta">🔒 בשלב הפיתוח</div>
+    </div>
+
+  </div>
+</div>
+
+<script src="sq-core.js"></script>
+<script>
+const session = requireAuth();
+
+function getInitials(name) {
+  const parts = (name || '').trim().split(/\s+/);
+  if (parts.length >= 2) return parts[0][0] + parts[parts.length - 1][0];
+  return (parts[0] || '?')[0];
+}
+function toggleDrawer() {
+  document.getElementById('mobile-drawer').classList.toggle('open');
+  document.getElementById('hamburger').classList.toggle('open');
+}
+
+document.getElementById('nav-avatar').textContent = getInitials(session.name);
+document.getElementById('nav-points').textContent = '⭐ ' + (session.points || 0) + ' נק׳';
+</script>
+</body>
+</html>

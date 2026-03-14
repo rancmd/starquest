@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>סטארקווסט — ספרים</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="sq-styles.css">
+<style>
+.page-main { max-width: 900px; margin: 0 auto; padding: 36px 24px 80px; }
+
+/* Breadcrumb */
+.breadcrumb {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 700; color: var(--text-soft);
+  margin-bottom: 28px; flex-wrap: wrap;
+}
+.breadcrumb a { color: var(--text-soft); text-decoration: none; transition: color 0.15s; }
+.breadcrumb a:hover { color: var(--blue); }
+.breadcrumb .sep { color: var(--border); font-size: 16px; }
+.breadcrumb .current { color: var(--navy); font-weight: 800; }
+
+.page-header { margin-bottom: 32px; }
+.page-title { font-size: 26px; font-weight: 900; color: var(--navy); margin-bottom: 6px; }
+.page-sub { font-size: 14px; color: var(--text-soft); font-weight: 500; }
+
+/* Books grid */
+.books-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+.book-card {
+  background: white; border-radius: 20px; padding: 28px;
+  box-shadow: var(--shadow); border: 2px solid transparent;
+  cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
+}
+.book-card:hover:not(.book-locked) {
+  border-color: var(--blue); transform: translateY(-4px); box-shadow: var(--shadow-lg);
+}
+.book-card.book-locked { cursor: default; }
+.book-card-stripe {
+  position: absolute; top: 0; left: 0; right: 0; height: 5px; border-radius: 20px 20px 0 0;
+  background: var(--blue);
+}
+.book-card.book-locked .book-card-stripe { background: var(--border); }
+
+.book-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+.book-icon { font-size: 36px; line-height: 1; }
+.book-coming {
+  background: var(--bg); color: var(--text-soft);
+  font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: 100px;
+  border: 1px solid var(--border);
+}
+.book-active-badge {
+  background: var(--blue-light); color: var(--blue);
+  font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: 100px;
+}
+
+.book-name { font-size: 18px; font-weight: 900; color: var(--navy); margin-bottom: 8px; line-height: 1.3; }
+.book-desc { font-size: 13px; color: var(--text-soft); font-weight: 500; line-height: 1.5; margin-bottom: 18px; }
+
+.book-footer { display: flex; align-items: center; justify-content: space-between; }
+.book-stats { display: flex; gap: 14px; }
+.book-stat { font-size: 12px; font-weight: 700; color: var(--text-soft); }
+.book-stat span { color: var(--navy); font-weight: 900; }
+.book-arrow { font-size: 18px; color: var(--blue); font-weight: 900; transition: transform 0.2s; }
+.book-card:hover:not(.book-locked) .book-arrow { transform: translateX(-4px); }
+
+/* Progress bar inside book card */
+.book-progress-wrap { margin-bottom: 16px; }
+.book-progress-label { font-size: 11px; font-weight: 800; color: var(--text-soft); margin-bottom: 5px; display: flex; justify-content: space-between; }
+.book-progress-bg { height: 6px; background: var(--border); border-radius: 100px; overflow: hidden; }
+.book-progress-fill { height: 100%; background: linear-gradient(90deg, var(--blue), #60a5fa); border-radius: 100px; transition: width 0.6s ease; }
+
+@media (max-width: 768px) {
+  .books-grid { grid-template-columns: 1fr; }
+  .page-main { padding: 20px 14px 60px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="nav-logo" href="app.html">⭐ סטאר<span>קווסט</span></a>
+  <div class="nav-links">
+    <button class="nav-link" onclick="window.location.href='app.html'">🏠 בית</button>
+    <button class="nav-link active">📝 דפי עבודה</button>
+    <button class="nav-link" onclick="window.location.href='app.html#leaderboard'">🏆 דירוג</button>
+    <button class="nav-link" onclick="window.location.href='app.html#profile'">👤 פרופיל</button>
+  </div>
+  <div class="nav-right">
+    <div class="nav-points" id="nav-points" onclick="window.location.href='app.html#leaderboard'" title="לחץ לדירוג">⭐ 0 נק׳</div>
+    <div class="nav-avatar" id="nav-avatar" onclick="window.location.href='app.html#profile'" title="לחץ לפרופיל">?</div>
+  </div>
+  <button class="hamburger" id="hamburger" onclick="toggleDrawer()" aria-label="תפריט">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-drawer" id="mobile-drawer">
+  <button class="nav-link" onclick="window.location.href='app.html'">🏠 בית</button>
+  <button class="nav-link active">📝 דפי עבודה</button>
+  <button class="nav-link" onclick="window.location.href='app.html#leaderboard'">🏆 דירוג</button>
+  <button class="nav-link" onclick="window.location.href='app.html#profile'">👤 פרופיל</button>
+</div>
+
+<div class="page-main">
+
+  <div class="breadcrumb">
+    <a href="app.html">🏠 לוח בקרה</a>
+    <span class="sep">›</span>
+    <a href="subjects.html">📝 דפי עבודה</a>
+    <span class="sep">›</span>
+    <span class="current" id="breadcrumb-subject">📐 מתמטיקה</span>
+  </div>
+
+  <div class="page-header">
+    <div class="page-title" id="page-title">ספרי מתמטיקה</div>
+    <div class="page-sub">בחר ספר כדי להיכנס למפת הנושאים שלו</div>
+  </div>
+
+  <div class="books-grid" id="books-grid"></div>
+
+</div>
+
+<script src="sq-core.js"></script>
+<script>
+const session = requireAuth();
+const params  = new URLSearchParams(window.location.search);
+const subject = params.get('subject') || 'math';
+
+function getInitials(name) {
+  const parts = (name || '').trim().split(/\s+/);
+  if (parts.length >= 2) return parts[0][0] + parts[parts.length - 1][0];
+  return (parts[0] || '?')[0];
+}
+function toggleDrawer() {
+  document.getElementById('mobile-drawer').classList.toggle('open');
+  document.getElementById('hamburger').classList.toggle('open');
+}
+
+// ── Subject definitions ───────────────────────────────────
+const SUBJECTS = {
+  math: {
+    name: 'מתמטיקה',
+    icon: '📐',
+    books: [
+      {
+        id: 'multiplication',
+        name: 'כפל וחילוק',
+        desc: 'כפל וחילוק בעשרות שלמות, במאות שלמות ובאלפים — פרק א׳ בספר',
+        icon: '✖️',
+        topics: 7,
+        map: 'map-multiplication.html',
+        active: true,
+      },
+      {
+        id: 'millions',
+        name: 'מספרים בתחום המיליון',
+        desc: 'קריאה, כתיבה והשוואה של מספרים גדולים עד מיליון',
+        icon: '🔢',
+        topics: 6,
+        map: null,
+        active: false,
+      },
+      {
+        id: 'geometry',
+        name: 'גאומטריה',
+        desc: 'צורות, זוויות, היקפים ושטחים',
+        icon: '📐',
+        topics: 5,
+        map: null,
+        active: false,
+      },
+      {
+        id: 'fractions',
+        name: 'שברים פשוטים',
+        desc: 'הכרת שברים, השוואה, חיבור וחיסור של שברים פשוטים',
+        icon: '½',
+        topics: 6,
+        map: null,
+        active: false,
+      },
+    ]
+  }
+};
+
+async function init() {
+  const subjectData = SUBJECTS[subject];
+  if (!subjectData) { window.location.href = 'subjects.html'; return; }
+
+  // Update breadcrumb & title
+  document.getElementById('breadcrumb-subject').textContent = subjectData.icon + ' ' + subjectData.name;
+  document.getElementById('page-title').textContent = 'ספרי ' + subjectData.name;
+
+  // Load progress to show per-book progress
+  const progress = await loadProgress(session.id);
+
+  // Build books
+  let html = '';
+  subjectData.books.forEach(book => {
+    // Count completed topics for this book (only multiplication has real data now)
+    let doneTopics = 0;
+    if (book.id === 'multiplication') {
+      const topicIds = ['noshe1','noshe2','noshe3','noshe4','noshe5','noshe6','noshe7'];
+      doneTopics = topicIds.filter(id => progress[id] && progress[id].stars > 0).length;
+    }
+    const pct = book.active ? Math.round((doneTopics / book.topics) * 100) : 0;
+
+    if (book.active) {
+      html += `
+        <div class="book-card" onclick="window.location.href='${book.map}'">
+          <div class="book-card-stripe"></div>
+          <div class="book-top">
+            <div class="book-icon">${book.icon}</div>
+            <div class="book-active-badge">✅ פעיל</div>
+          </div>
+          <div class="book-name">${book.name}</div>
+          <div class="book-desc">${book.desc}</div>
+          <div class="book-progress-wrap">
+            <div class="book-progress-label">
+              <span>התקדמות</span>
+              <span>${doneTopics}/${book.topics} נושאים</span>
+            </div>
+            <div class="book-progress-bg">
+              <div class="book-progress-fill" style="width:${pct}%"></div>
+            </div>
+          </div>
+          <div class="book-footer">
+            <div class="book-stats">
+              <div class="book-stat"><span>${book.topics}</span> נושאים</div>
+            </div>
+            <div class="book-arrow">←</div>
+          </div>
+        </div>`;
+    } else {
+      html += `
+        <div class="book-card book-locked">
+          <div class="book-card-stripe"></div>
+          <div class="book-top">
+            <div class="book-icon">${book.icon}</div>
+            <div class="book-coming">בקרוב</div>
+          </div>
+          <div class="book-name">${book.name}</div>
+          <div class="book-desc">${book.desc}</div>
+          <div class="book-footer">
+            <div class="book-stats">
+              <div class="book-stat"><span>${book.topics}</span> נושאים מתוכננים</div>
+            </div>
+            <div style="font-size:20px;">🔒</div>
+          </div>
+        </div>`;
+    }
+  });
+
+  document.getElementById('books-grid').innerHTML = html;
+}
+
+document.getElementById('nav-avatar').textContent = getInitials(session.name);
+document.getElementById('nav-points').textContent = '⭐ ' + (session.points || 0) + ' נק׳';
+init();
+</script>
+</body>
+</html>

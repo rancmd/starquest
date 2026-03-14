@@ -80,7 +80,7 @@
   <a class="nav-logo" href="app.html">⭐ סטאר<span>קווסט</span></a>
   <div class="nav-links">
     <button class="nav-link active" onclick="showDash('home')" id="nav-home">🏠 בית</button>
-    <button class="nav-link" onclick="showDash('worksheets')" id="nav-worksheets">📝 דפי עבודה</button>
+    <button class="nav-link" onclick="window.location.href='subjects.html'" id="nav-worksheets">📝 דפי עבודה</button>
     <button class="nav-link" onclick="showDash('leaderboard')" id="nav-leaderboard">🏆 דירוג</button>
     <button class="nav-link" onclick="showDash('profile')" id="nav-profile">👤 פרופיל</button>
   </div>
@@ -98,7 +98,7 @@
 <!-- Mobile drawer -->
 <div class="mobile-drawer" id="mobile-drawer">
   <button class="nav-link" onclick="showDash('home');closeDrawer()">🏠 בית</button>
-  <button class="nav-link" onclick="showDash('worksheets');closeDrawer()">📝 דפי עבודה</button>
+  <button class="nav-link" onclick="window.location.href='subjects.html'">📝 דפי עבודה</button>
   <button class="nav-link" onclick="showDash('leaderboard');closeDrawer()">🏆 דירוג</button>
   <button class="nav-link" onclick="showDash('profile');closeDrawer()">👤 פרופיל</button>
   <div class="mobile-drawer-sep"></div>
@@ -120,7 +120,7 @@
     </div>
     <h3 style="font-size:17px;font-weight:900;margin-bottom:16px;color:var(--navy);">המשך ללמוד ←</h3>
     <div class="worksheets-grid">
-      <div class="worksheet-card" onclick="window.location.href='map.html'">
+      <div class="worksheet-card" onclick="window.location.href='subjects.html'">
         <span class="ws-subject math">חשבון</span>
         <div class="ws-title">פרק א׳ — כפל וחילוק</div>
         <div style="font-size:13px;color:var(--text-soft);margin-top:6px;">7 נושאים · מפת שלבים</div>
@@ -152,7 +152,7 @@
       <button class="filter-btn" onclick="filterWS(this,'science')">🔬 מדעים</button>
     </div>
     <div class="worksheets-grid" id="ws-grid">
-      <div class="worksheet-card" data-subject="math" onclick="window.location.href='map.html'">
+      <div class="worksheet-card" data-subject="math" onclick="window.location.href='subjects.html'">
         <span class="ws-subject math">חשבון</span>
         <div class="ws-title">פרק א׳ — כפל וחילוק בעשרות שלמות</div>
         <div style="font-size:13px;color:var(--text-soft);margin-top:6px;">7 נושאים · מפת שלבים</div>

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>סטארקווסט — כפל וחילוק</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="sq-styles.css">
+<style>
+.lm-main { max-width: 900px; margin: 0 auto; padding: 36px 24px 80px; }
+
+/* Breadcrumb */
+.breadcrumb {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 700; color: var(--text-soft);
+  margin-bottom: 28px; flex-wrap: wrap;
+}
+.breadcrumb a { color: var(--text-soft); text-decoration: none; transition: color 0.15s; }
+.breadcrumb a:hover { color: var(--blue); }
+.breadcrumb .sep { color: var(--border); font-size: 16px; }
+.breadcrumb .current { color: var(--navy); font-weight: 800; }
+
+.chapter-header {
+  background: linear-gradient(135deg, var(--navy) 0%, #2a2a55 100%);
+  border-radius: 20px; padding: 28px 32px; margin-bottom: 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: var(--shadow-lg); position: relative; overflow: hidden;
+}
+.chapter-header::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: radial-gradient(circle at 10% 50%, rgba(245,197,24,0.08) 0%, transparent 60%),
+                    radial-gradient(circle at 90% 20%, rgba(45,107,228,0.15) 0%, transparent 50%);
+  pointer-events: none;
+}
+.chapter-info { position: relative; z-index: 1; }
+.chapter-badge { display: inline-block; background: rgba(245,197,24,0.2); border: 1px solid rgba(245,197,24,0.4); color: var(--gold); font-size: 12px; font-weight: 800; padding: 4px 12px; border-radius: 100px; margin-bottom: 10px; }
+.chapter-title { font-size: 20px; font-weight: 900; color: white; margin-bottom: 6px; }
+.chapter-sub { font-size: 14px; color: rgba(255,255,255,0.6); font-weight: 500; }
+.chapter-progress-wrap { position: relative; z-index: 1; text-align: center; }
+.chapter-ring { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
+.chapter-ring::before { content: ''; position: absolute; inset: 8px; border-radius: 50%; background: var(--navy); }
+.chapter-ring-inner { position: relative; z-index: 1; font-size: 18px; font-weight: 900; color: var(--gold); }
+.chapter-ring-label { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 8px; font-weight: 700; }
+
+.stars-banner { background: white; border-radius: var(--radius); padding: 16px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow); border: 2px solid var(--border); }
+.stars-banner-left { display: flex; align-items: center; gap: 12px; }
+.stars-total { font-size: 26px; font-weight: 900; color: var(--gold-dark); }
+
+.connector { width: 3px; height: 40px; margin: 0 auto; position: relative; z-index: 0; transition: background 0.4s; background: var(--border); }
+.connector.done   { background: linear-gradient(180deg, var(--gold), var(--gold-dark)); }
+.connector.active { background: linear-gradient(180deg, var(--blue), var(--blue-light)); }
+
+.level-row { display: flex; align-items: center; gap: 16px; }
+.level-node { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; border: 3px solid var(--border); background: white; transition: all 0.2s; position: relative; z-index: 1; }
+.level-node.done   { background: var(--gold); border-color: var(--gold-dark); box-shadow: 0 0 0 4px rgba(245,197,24,0.2); }
+.level-node.active { background: var(--blue); border-color: var(--blue-dark); box-shadow: 0 0 0 6px rgba(45,107,228,0.2); animation: pulse 2s infinite; }
+.level-node.locked { background: #f1f5f9; border-color: #cbd5e1; }
+
+.level-card { flex: 1; background: white; border-radius: var(--radius); padding: 18px 22px; border: 2px solid var(--border); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+.level-card:hover:not(.locked-card) { border-color: var(--blue); transform: translateX(-3px); box-shadow: var(--shadow-lg); }
+.level-card.done-card   { border-color: rgba(245,197,24,0.4); background: linear-gradient(135deg,#fffbeb,white); }
+.level-card.active-card { border-color: var(--blue); background: linear-gradient(135deg,var(--blue-light),white); }
+.level-card.locked-card { opacity: 0.55; cursor: default; }
+.level-card-left { display: flex; flex-direction: column; gap: 5px; }
+.level-num   { font-size: 11px; font-weight: 800; color: var(--text-soft); }
+.level-title { font-size: 16px; font-weight: 900; color: var(--navy); line-height: 1.3; }
+.level-meta  { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--text-soft); font-weight: 600; margin-top: 2px; }
+.level-meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border); }
+.level-card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+.stars-row { display: flex; gap: 3px; direction: ltr; }
+.star-icon { font-size: 20px; filter: grayscale(1) opacity(0.3); }
+.star-icon.earned { filter: none; }
+.score-badge { font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 100px; }
+.score-badge.perfect { background: #dcfce7; color: #15803d; }
+.score-badge.good    { background: var(--blue-light); color: var(--blue); }
+.score-badge.pass    { background: #fef9c3; color: #a16207; }
+.level-btn { padding: 7px 16px; border-radius: 100px; font-family: 'Heebo',sans-serif; font-size: 12px; font-weight: 800; border: none; cursor: pointer; transition: all 0.2s; }
+.level-btn.btn-start  { background: var(--blue); color: white; }
+.level-btn.btn-start:hover  { background: var(--blue-dark); }
+.level-btn.btn-retry  { background: rgba(245,197,24,0.15); color: var(--gold-dark); border: 1px solid rgba(245,197,24,0.4); }
+.level-btn.btn-retry:hover  { background: rgba(245,197,24,0.25); }
+.level-btn.btn-locked { background: #f1f5f9; color: #94a3b8; cursor: default; }
+.chapter-locked { background: #f8fafc; border-radius: 14px; border: 2px dashed #cbd5e1; padding: 24px; text-align: center; margin-top: 32px; color: var(--locked); font-weight: 700; font-size: 14px; }
+
+.lm-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(26,26,46,0.7); z-index: 200; align-items: center; justify-content: center; padding: 24px; }
+.lm-modal-overlay.show { display: flex; }
+.lm-modal { background: white; border-radius: 20px; padding: 32px; max-width: 420px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center; animation: slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+.lm-modal-emoji  { font-size: 52px; margin-bottom: 12px; }
+.lm-modal-title  { font-size: 22px; font-weight: 900; color: var(--navy); margin-bottom: 6px; }
+.lm-modal-sub    { font-size: 14px; color: var(--text-soft); margin-bottom: 20px; }
+.lm-modal-stars  { display: flex; justify-content: center; gap: 8px; margin-bottom: 24px; }
+.lm-modal-star   { font-size: 36px; transition: all 0.3s; }
+.lm-modal-star.dim { filter: grayscale(1) opacity(0.25); }
+.lm-modal-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.modal-btn { padding: 12px 24px; border-radius: 12px; font-family: 'Heebo',sans-serif; font-size: 15px; font-weight: 800; border: none; cursor: pointer; transition: all 0.2s; }
+.modal-btn.primary   { background: var(--blue); color: white; }
+.modal-btn.primary:hover { background: var(--blue-dark); transform: translateY(-1px); }
+.modal-btn.secondary { background: var(--bg); color: var(--text-soft); border: 2px solid var(--border); }
+.modal-btn.secondary:hover { border-color: var(--blue); color: var(--blue); }
+
+@media (max-width: 768px) {
+  .lm-main { padding: 20px 14px 60px; }
+  .chapter-header { flex-direction: column; gap: 16px; }
+  .level-title { font-size: 14px; }
+  .level-card { padding: 14px 16px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="nav-logo" href="app.html">⭐ סטאר<span>קווסט</span></a>
+  <div class="nav-links">
+    <button class="nav-link" onclick="window.location.href='app.html'">🏠 בית</button>
+    <button class="nav-link active">📝 דפי עבודה</button>
+    <button class="nav-link" onclick="window.location.href='app.html#leaderboard'">🏆 דירוג</button>
+    <button class="nav-link" onclick="window.location.href='app.html#profile'">👤 פרופיל</button>
+  </div>
+  <div class="nav-right">
+    <div class="nav-points" id="nav-points" onclick="window.location.href='app.html#leaderboard'" title="לחץ לדירוג">⭐ 0 נק׳</div>
+    <div class="nav-avatar" id="nav-avatar" onclick="window.location.href='app.html#profile'" title="לחץ לפרופיל">?</div>
+  </div>
+  <button class="hamburger" id="hamburger" onclick="toggleDrawer()" aria-label="תפריט">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-drawer" id="mobile-drawer">
+  <button class="nav-link" onclick="window.location.href='app.html'">🏠 בית</button>
+  <button class="nav-link active">📝 דפי עבודה</button>
+  <button class="nav-link" onclick="window.location.href='app.html#leaderboard'">🏆 דירוג</button>
+  <button class="nav-link" onclick="window.location.href='app.html#profile'">👤 פרופיל</button>
+</div>
+
+<div class="lm-main">
+
+  <div class="breadcrumb">
+    <a href="app.html">🏠 לוח בקרה</a>
+    <span class="sep">›</span>
+    <a href="subjects.html">📝 דפי עבודה</a>
+    <span class="sep">›</span>
+    <a href="books.html?subject=math">📐 מתמטיקה</a>
+    <span class="sep">›</span>
+    <span class="current">✖️ כפל וחילוק</span>
+  </div>
+
+  <div class="stars-banner">
+    <div class="stars-banner-left">
+      <div class="stars-total" id="lm-stars-total">⭐ 0</div>
+      <div>
+        <div style="font-size:15px;font-weight:900;color:var(--navy);">כוכבים שאספת</div>
+        <div style="font-size:13px;color:var(--text-soft);font-weight:600;">מתוך 21 אפשריים בספר זה</div>
+      </div>
+    </div>
+    <a href="books.html?subject=math" style="font-size:13px;font-weight:800;color:var(--text-soft);text-decoration:none;padding:8px 14px;border-radius:10px;border:2px solid var(--border);">← חזרה לספרים</a>
+  </div>
+
+  <div class="chapter-header">
+    <div class="chapter-info">
+      <div class="chapter-badge">📐 מתמטיקה · כפל וחילוק</div>
+      <div class="chapter-title">פרק א׳ — כפל וחילוק בעשרות שלמות ובמאות שלמות</div>
+      <div class="chapter-sub">7 נושאים · עד 21 כוכבים</div>
+    </div>
+    <div class="chapter-progress-wrap">
+      <div class="chapter-ring" id="lm-ring">
+        <div class="chapter-ring-inner" id="lm-ring-inner">0/7</div>
+      </div>
+      <div class="chapter-ring-label">נושאים הושלמו</div>
+    </div>
+  </div>
+
+  <div id="lm-map"></div>
+
+  <div class="chapter-locked">
+    <div style="font-size:32px;margin-bottom:8px;">🔒</div>
+    <div>פרק ב׳ — כפל</div>
+    <div style="font-size:12px;margin-top:4px;opacity:0.7;">השלם את פרק א׳ כדי לפתוח</div>
+  </div>
+</div>
+
+<div class="lm-modal-overlay" id="lm-modal" onclick="closeLMModal(event)">
+  <div class="lm-modal">
+    <div class="lm-modal-emoji"  id="lm-modal-emoji">📝</div>
+    <div class="lm-modal-title"  id="lm-modal-title"></div>
+    <div class="lm-modal-sub"    id="lm-modal-sub"></div>
+    <div class="lm-modal-stars"  id="lm-modal-stars"></div>
+    <div class="lm-modal-actions" id="lm-modal-actions"></div>
+  </div>
+</div>
+
+<script src="sq-core.js"></script>
+<script>
+const session = requireAuth();
+let progress = {};
+
+function getInitials(name) {
+  const parts = (name || '').trim().split(/\s+/);
+  if (parts.length >= 2) return parts[0][0] + parts[parts.length - 1][0];
+  return (parts[0] || '?')[0];
+}
+function toggleDrawer() {
+  document.getElementById('mobile-drawer').classList.toggle('open');
+  document.getElementById('hamburger').classList.toggle('open');
+}
+
+// ── LEVELS: noshe1 at top → noshe7 at bottom ──────────────
+// Unlock logic: noshe1 always active first, each unlocks the next
+const LEVELS = [
+  { id:'noshe1', num:'נושא 1', title:'כפל ב-10, ב-100 וב-1,000',                   questions:18, minutes:10, worksheet:'worksheet.html?topic=noshe1' },
+  { id:'noshe2', num:'נושא 2', title:'כפל בעשרות שלמות ובמאות שלמות',              questions:20, minutes:12, worksheet:'worksheet.html?topic=noshe2' },
+  { id:'noshe3', num:'נושא 3', title:'חילוק במחלק חד-ספרתי ב-10, ב-100 וב-1,000', questions:18, minutes:10, worksheet: null },
+  { id:'noshe4', num:'נושא 4', title:'חילוק בעשרות שלמות ובמאות שלמות',            questions:20, minutes:12, worksheet: null },
+  { id:'noshe5', num:'נושא 5', title:'הקשר בין כפל לבין חילוק',                     questions:16, minutes:10, worksheet: null },
+  { id:'noshe6', num:'נושא 6', title:'סדר פעולות החשבון ושימוש בסוגריים',           questions:18, minutes:12, worksheet: null },
+  { id:'noshe7', num:'נושא 7', title:'תכונות ה-0 וה-1',                             questions:20, minutes:15, worksheet:'worksheet.html?topic=noshe7' },
+];
+
+function getLevelState(levelId) {
+  const p = progress[levelId];
+  if (p && p.stars > 0) return 'done';
+  const idx = LEVELS.findIndex(l => l.id === levelId);
+  if (idx === 0) return 'active'; // noshe1 always unlocked first
+  const prev = LEVELS[idx - 1];
+  const prevP = progress[prev.id];
+  if (prevP && prevP.stars > 0) return 'active';
+  return 'locked';
+}
+
+async function init() {
+  progress = await loadProgress(session.id);
+  const { totalPoints, totalStars, doneCount } = computeTotals(progress);
+
+  document.getElementById('nav-avatar').textContent     = getInitials(session.name);
+  document.getElementById('nav-points').textContent     = '⭐ ' + totalPoints + ' נק׳';
+  document.getElementById('lm-stars-total').textContent = '⭐ ' + totalStars;
+  document.getElementById('lm-ring-inner').textContent  = doneCount + '/7';
+
+  const pct = Math.round((doneCount / 7) * 100);
+  document.getElementById('lm-ring').style.background =
+    `conic-gradient(var(--gold) ${pct}%, rgba(255,255,255,0.1) 0%)`;
+
+  renderMap();
+}
+
+function renderMap() {
+  let html = '';
+  LEVELS.forEach((level, idx) => {
+    const state = getLevelState(level.id);
+    const ldata = progress[level.id];
+    const stars = ldata ? ldata.stars : 0;
+    const score = ldata ? ldata.score : 0;
+
+    if (idx > 0) {
+      const prevState = getLevelState(LEVELS[idx-1].id);
+      html += `<div class="connector ${prevState==='done'?'done':state==='active'?'active':''}"></div>`;
+    }
+
+    const nodeClass = state === 'done' ? 'done' : state === 'active' ? 'active' : 'locked';
+    const nodeIcon  = state === 'done' ? '✓' : state === 'active' ? '▶' : '🔒';
+    const cardClass = state === 'done' ? 'done-card' : state === 'active' ? 'active-card' : 'locked-card';
+
+    let starsHtml = '<div class="stars-row">';
+    for (let i = 1; i <= 3; i++) starsHtml += `<span class="star-icon ${i <= stars ? 'earned' : ''}">⭐</span>`;
+    starsHtml += '</div>';
+    if (state === 'locked') starsHtml = '<span style="font-size:12px;color:#94a3b8">🔒 נעול</span>';
+
+    let scoreBadge = '';
+    if (state === 'done') {
+      const cls = score === 100 ? 'perfect' : score >= 80 ? 'good' : 'pass';
+      scoreBadge = `<span class="score-badge ${cls}">${score}%</span>`;
+    }
+
+    const btnHtml = state === 'done'
+      ? `<button class="level-btn btn-retry" onclick="openModal('${level.id}')">שפר ⭐</button>`
+      : state === 'active'
+        ? `<button class="level-btn btn-start" onclick="openModal('${level.id}')">התחל ▶</button>`
+        : `<button class="level-btn btn-locked">🔒 נעול</button>`;
+
+    const clickHandler = state !== 'locked' ? `onclick="openModal('${level.id}')"` : '';
+
+    html += `
+      <div class="level-row">
+        <div class="level-node ${nodeClass}">${nodeIcon}</div>
+        <div class="level-card ${cardClass}" ${clickHandler}>
+          <div class="level-card-left">
+            <div class="level-num">${level.num}</div>
+            <div class="level-title">${level.title}</div>
+            <div class="level-meta">
+              <span>${level.questions} שאלות</span>
+              <span class="level-meta-dot"></span>
+              <span>~${level.minutes} דק׳</span>
+              ${state === 'done' ? `<span class="level-meta-dot"></span>${scoreBadge}` : ''}
+            </div>
+          </div>
+          <div class="level-card-right">${starsHtml}${btnHtml}</div>
+        </div>
+      </div>`;
+  });
+  document.getElementById('lm-map').innerHTML = html;
+}
+
+function openModal(id) {
+  const level = LEVELS.find(l => l.id === id);
+  const state = getLevelState(id);
+  if (!level || state === 'locked') return;
+
+  const ldata = progress[id];
+  const isDone = state === 'done';
+  const stars  = ldata ? ldata.stars : 0;
+
+  document.getElementById('lm-modal-emoji').textContent = isDone ? '⭐' : '📝';
+  document.getElementById('lm-modal-title').textContent = level.title;
+  document.getElementById('lm-modal-sub').textContent   = isDone
+    ? `ציון קודם: ${ldata.score}% · רוצה לשפר?`
+    : `${level.questions} שאלות · ~${level.minutes} דקות`;
+
+  let starsHtml = '';
+  for (let i = 1; i <= 3; i++) starsHtml += `<span class="lm-modal-star ${i <= stars ? '' : 'dim'}">⭐</span>`;
+  document.getElementById('lm-modal-stars').innerHTML = starsHtml;
+
+  let actions;
+  if (level.worksheet) {
+    actions = `<button class="modal-btn primary" onclick="startLevel('${level.id}')">
+                 ${isDone ? '🔄 שחק שוב' : '▶ התחל עכשיו!'}
+               </button>
+               <button class="modal-btn secondary" onclick="closeLMModal()">אחר כך</button>`;
+  } else {
+    actions = `<button class="modal-btn primary" onclick="closeLMModal();showToast('🚀 בקרוב!')">🚀 בקרוב!</button>
+               <button class="modal-btn secondary" onclick="closeLMModal()">סגור</button>`;
+  }
+  document.getElementById('lm-modal-actions').innerHTML = actions;
+  document.getElementById('lm-modal').classList.add('show');
+}
+
+function startLevel(id) {
+  const level = LEVELS.find(l => l.id === id);
+  document.getElementById('lm-modal').classList.remove('show');
+  if (level && level.worksheet) window.location.href = level.worksheet;
+  else showToast('🚀 נושא זה יהיה זמין בקרוב!');
+}
+
+function closeLMModal(e) {
+  if (!e || e.target === document.getElementById('lm-modal'))
+    document.getElementById('lm-modal').classList.remove('show');
+}
+
+init();
+</script>
+</body>
+</html>
