@@ -6,25 +6,32 @@
 <title>סטארקווסט — למד. הרוויח. גדל.</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="stylesheet" href="sq-styles.css">
 <style>
+/* ===== GLOBAL ===== */
+:root {
+  --blue: #2D6BE4; --blue-dark: #1f52b8; --blue-light: #e8f0fd;
+  --gold: #F5C518; --gold-dark: #d4a900;
+  --navy: #1A1A2E; --navy-mid: #2a2a45;
+  --white: #ffffff; --bg: #f5f7ff;
+  --text: #1A1A2E; --text-soft: #6b7280;
+  --border: #e2e8f0;
+  --success: #16a34a; --success-bg: #f0fdf4;
+  --error: #dc2626; --error-bg: #fff5f5;
+  --locked: #94a3b8;
+  --radius: 14px;
+  --shadow: 0 4px 24px rgba(45,107,228,0.10);
+  --shadow-lg: 0 8px 40px rgba(45,107,228,0.18);
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-user-select:none; user-select:none; }
+input, textarea, select { -webkit-user-select:text; user-select:text; }
+body { font-family:'Heebo',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; direction:rtl; }
+
+/* ===== SCREEN SYSTEM ===== */
 .screen { display:none; min-height:100vh; }
 .screen.active { display:flex; flex-direction:column; }
 
-/* LANDING */
-#screen-landing { background:var(--navy); position:relative; overflow:hidden; align-items:stretch; }
-.stars-bg { position:absolute; inset:0; background-image: radial-gradient(circle at 20% 30%, rgba(245,197,24,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(45,107,228,0.15) 0%, transparent 50%); pointer-events:none; }
-.star-dots { position:absolute; inset:0; pointer-events:none; background-image: radial-gradient(1.5px 1.5px at 10% 15%, rgba(255,255,255,0.6) 0%, transparent 100%), radial-gradient(1px 1px at 25% 40%, rgba(255,255,255,0.4) 0%, transparent 100%), radial-gradient(2px 2px at 60% 10%, rgba(245,197,24,0.8) 0%, transparent 100%), radial-gradient(1px 1px at 75% 55%, rgba(255,255,255,0.5) 0%, transparent 100%), radial-gradient(1.5px 1.5px at 85% 25%, rgba(255,255,255,0.4) 0%, transparent 100%), radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,0.3) 0%, transparent 100%), radial-gradient(2px 2px at 90% 80%, rgba(245,197,24,0.6) 0%, transparent 100%), radial-gradient(1px 1px at 15% 85%, rgba(255,255,255,0.4) 0%, transparent 100%); }
-.landing-nav { position:relative; z-index:10; display:flex; align-items:center; justify-content:space-between; padding:24px 48px; }
-.logo { font-size:22px; font-weight:900; color:white; }
-.logo span { color:var(--gold); }
-.hero { flex:1; display:flex; align-items:center; justify-content:center; flex-direction:column; text-align:center; padding:60px 24px; position:relative; z-index:1; }
-.hero-badge { display:inline-block; background:rgba(245,197,24,0.15); border:1px solid rgba(245,197,24,0.3); color:var(--gold); font-size:13px; font-weight:800; padding:6px 18px; border-radius:100px; margin-bottom:24px; }
-.hero h1 { font-size:clamp(36px,6vw,64px); font-weight:900; color:white; line-height:1.1; margin-bottom:20px; }
-.hero h1 span { color:var(--gold); }
-.hero-sub { font-size:18px; color:rgba(255,255,255,0.65); max-width:480px; line-height:1.6; margin-bottom:40px; }
-.hero-actions { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
-.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:13px 28px; border-radius:var(--radius); font-family:'Heebo',sans-serif; font-size:16px; font-weight:800; border:none; cursor:pointer; transition:all 0.2s; }
+/* ===== SHARED: BUTTONS ===== */
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:13px 28px; border-radius:var(--radius); font-family:'Heebo',sans-serif; font-size:16px; font-weight:800; border:none; cursor:pointer; transition:all 0.2s; text-decoration:none; }
 .btn-primary { background:var(--gold); color:var(--navy); box-shadow:0 4px 20px rgba(245,197,24,0.35); }
 .btn-primary:hover { background:var(--gold-dark); transform:translateY(-2px); }
 .btn-blue { background:var(--blue); color:white; }
@@ -32,6 +39,24 @@
 .btn-outline { background:transparent; border:2px solid rgba(255,255,255,0.3); color:white; }
 .btn-outline:hover { background:rgba(255,255,255,0.1); }
 .btn-full { width:100%; }
+
+/* ===== TOAST ===== */
+.toast { position:fixed; bottom:28px; right:50%; transform:translateX(50%) translateY(80px); background:var(--navy); color:white; padding:12px 24px; border-radius:100px; font-size:14px; font-weight:800; z-index:9999; transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1); pointer-events:none; white-space:nowrap; }
+.toast.show { transform:translateX(50%) translateY(0); }
+
+/* ===== LANDING ===== */
+#screen-landing { background:var(--navy); position:relative; overflow:hidden; }
+.stars-bg { position:absolute; inset:0; background-image: radial-gradient(circle at 20% 30%, rgba(245,197,24,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(45,107,228,0.15) 0%, transparent 50%); pointer-events:none; }
+.star-dots { position:absolute; inset:0; pointer-events:none; background-image: radial-gradient(1.5px 1.5px at 10% 15%, rgba(255,255,255,0.6) 0%, transparent 100%), radial-gradient(1px 1px at 25% 40%, rgba(255,255,255,0.4) 0%, transparent 100%), radial-gradient(2px 2px at 60% 10%, rgba(245,197,24,0.8) 0%, transparent 100%), radial-gradient(1px 1px at 75% 55%, rgba(255,255,255,0.5) 0%, transparent 100%), radial-gradient(1.5px 1.5px at 85% 25%, rgba(255,255,255,0.4) 0%, transparent 100%), radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,0.3) 0%, transparent 100%), radial-gradient(2px 2px at 90% 80%, rgba(245,197,24,0.6) 0%, transparent 100%), radial-gradient(1px 1px at 15% 85%, rgba(255,255,255,0.4) 0%, transparent 100%), radial-gradient(1px 1px at 30% 90%, rgba(245,197,24,0.5) 0%, transparent 100%); }
+.landing-nav { position:relative; z-index:10; display:flex; align-items:center; justify-content:space-between; padding:24px 48px; }
+.logo { font-size:22px; font-weight:900; color:white; }
+.logo span { color:var(--gold); }
+.hero { flex:1; display:flex; align-items:center; justify-content:center; flex-direction:column; text-align:center; padding:60px 24px; position:relative; z-index:1; }
+.hero-badge { display:inline-block; background:rgba(245,197,24,0.15); border:1px solid rgba(245,197,24,0.3); color:var(--gold); font-size:13px; font-weight:800; padding:6px 18px; border-radius:100px; margin-bottom:24px; }
+.hero h1 { font-size:clamp(36px,6vw,64px); font-weight:900; color:white; line-height:1.1; margin-bottom:20px; }
+.hero h1 span { color:var(--gold); }
+.hero-sub { font-size:18px; color:rgba(255,255,255,0.65); max-width:520px; line-height:1.6; margin-bottom:40px; }
+.hero-actions { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
 .features { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; max-width:700px; margin:60px auto 0; padding:0 24px; position:relative; z-index:1; }
 .feature-card { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:24px; text-align:center; }
 .feature-icon { font-size:32px; margin-bottom:12px; }
@@ -39,33 +64,45 @@
 .feature-desc { font-size:13px; color:rgba(255,255,255,0.5); line-height:1.5; }
 .landing-footer { text-align:center; padding:32px; color:rgba(255,255,255,0.25); font-size:12px; position:relative; z-index:1; }
 
-/* AUTH */
+/* ===== AUTH ===== */
 #screen-signup, #screen-login { align-items:center; justify-content:center; background:var(--bg); }
-.auth-card { background:white; border-radius:20px; padding:40px; width:100%; max-width:420px; box-shadow:var(--shadow-lg); margin:24px; }
+.auth-card { background:white; border-radius:20px; padding:40px; width:100%; max-width:420px; box-shadow:var(--shadow-lg); margin:24px; animation:fadeUp 0.4s ease both; }
 .auth-logo { text-align:center; font-size:22px; font-weight:900; color:var(--navy); margin-bottom:8px; }
+.auth-logo span { color:var(--gold); }
 .auth-title { font-size:22px; font-weight:900; color:var(--navy); margin-bottom:6px; text-align:center; }
 .auth-sub { font-size:14px; color:var(--text-soft); text-align:center; margin-bottom:28px; }
 .form-group { margin-bottom:18px; }
 .form-label { display:block; font-size:13px; font-weight:800; color:var(--navy); margin-bottom:7px; }
-.form-input, .form-select { width:100%; padding:12px 14px; border:2px solid var(--border); border-radius:10px; font-family:'Heebo',sans-serif; font-size:15px; color:var(--text); outline:none; transition:all 0.2s; background:white; }
+.form-hint { font-size:11px; color:var(--text-soft); font-weight:600; margin-top:4px; }
+.form-input, .form-select { width:100%; padding:12px 14px; border:2px solid var(--border); border-radius:10px; font-family:'Heebo',sans-serif; font-size:15px; color:var(--text); outline:none; transition:all 0.2s; background:white; -webkit-user-select:text; user-select:text; }
 .form-input:focus, .form-select:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(45,107,228,0.12); }
-.form-error { font-size:12px; color:var(--error); font-weight:700; margin-top:5px; }
+.form-error { font-size:12px; color:var(--error); font-weight:700; margin-top:5px; display:none; }
 .divider { text-align:center; color:var(--text-soft); font-size:13px; font-weight:700; margin:18px 0; position:relative; }
 .divider::before, .divider::after { content:''; position:absolute; top:50%; width:42%; height:1px; background:var(--border); }
 .divider::before { right:0; } .divider::after { left:0; }
 .auth-switch { text-align:center; font-size:13px; color:var(--text-soft); margin-top:14px; }
 .auth-switch a { color:var(--blue); font-weight:800; cursor:pointer; }
 
+/* ===== ANIMATIONS ===== */
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+.fadein { animation:fadeUp 0.4s ease both; }
+
+/* ===== RESPONSIVE ===== */
 @media(max-width:768px) {
   .features { grid-template-columns:1fr; }
   .landing-nav { padding:16px 24px; }
   .hero { padding:40px 24px; }
+  .hero h1 { font-size:36px; }
+  .hero-sub { font-size:15px; }
+  .hero-actions { flex-direction:column; align-items:center; }
+  .hero-actions .btn { width:100%; max-width:300px; justify-content:center; }
+  .auth-card { padding:28px 20px; margin:16px; }
 }
 </style>
 </head>
 <body>
 
-<!-- LANDING -->
+<!-- ===================== LANDING ===================== -->
 <div id="screen-landing" class="screen active">
   <div class="stars-bg"></div>
   <div class="star-dots"></div>
@@ -77,33 +114,45 @@
     </div>
   </nav>
   <div class="hero">
-    <div class="hero-badge">🚀 פלטפורמת למידה לכיתה ד׳</div>
-    <h1>למד. הרוויח. <span>גדל.</span></h1>
-    <p class="hero-sub">צבור נקודות, פתח עיטורים ועלה בדירוג הכיתה — על ידי לימוד אמיתי.</p>
+    <div class="hero-badge">🚀 פלטפורמת למידה לכיתות ד׳</div>
+    <h1>ילדים לומדים יותר<br>כשזה <span>מרגיש כמו משחק</span></h1>
+    <p class="hero-sub">סטארקווסט הופכת דפי עבודה לחוויה — ילדך פותר תרגילים, צובר כוכבים ועולה בדירוג הכיתה. המוטיבציה מגיעה מבפנים.</p>
     <div class="hero-actions">
       <button class="btn btn-primary" onclick="showScreen('signup')">🚀 התחל עכשיו — חינם</button>
       <button class="btn btn-outline" onclick="demoLogin()">👀 כניסת דמו</button>
     </div>
   </div>
   <div class="features">
-    <div class="feature-card"><div class="feature-icon">⭐</div><div class="feature-title">צבור נקודות</div><div class="feature-desc">כל תשובה נכונה מרוויחה נקודות ומעלה אותך בדירוג</div></div>
-    <div class="feature-card"><div class="feature-icon">🗺️</div><div class="feature-title">מפת שלבים</div><div class="feature-desc">התקדם בין נושאים, פתח שלבים חדשים וצבור כוכבים</div></div>
-    <div class="feature-card"><div class="feature-icon">🏆</div><div class="feature-title">דירוג כיתתי</div><div class="feature-desc">תתחרה עם חברים לכיתה ועלה בטבלת הדירוג</div></div>
+    <div class="feature-card">
+      <div class="feature-icon">⭐</div>
+      <div class="feature-title">תשובה נכונה = נקודה</div>
+      <div class="feature-desc">פידבק מיידי על כל תשובה — הילד יודע בדיוק איפה הוא עומד</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🗺️</div>
+      <div class="feature-title">מסלול ברור קדימה</div>
+      <div class="feature-desc">מפת שלבים לפי נושאי הספר — כל נושא שנפתח מחכה לשלב הבא</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🏆</div>
+      <div class="feature-title">תחרות בריאה עם הכיתה</div>
+      <div class="feature-desc">טבלת דירוג כיתתית — כולם רואים את ההתקדמות שלהם ביחס לחברים</div>
+    </div>
   </div>
-  <div class="landing-footer">סטארקווסט © 2026 · בטא · כיתה ד׳</div>
+  <div class="landing-footer">סטארקווסט © 2026 · בטא · כיתות ד׳</div>
 </div>
 
-<!-- SIGNUP -->
+<!-- ===================== SIGNUP ===================== -->
 <div id="screen-signup" class="screen">
   <div class="auth-card fadein">
-    <div class="auth-logo">⭐ סטארקווסט</div>
+    <div class="auth-logo">⭐ סטאר<span>קווסט</span></div>
     <h2 class="auth-title">צור חשבון חדש</h2>
     <p class="auth-sub">הצטרף ותתחיל לצבור כוכבים! ⭐</p>
     <div class="form-group">
-      <label class="form-label">השם שלך</label>
-      <input type="text" class="form-input" id="signup-name" placeholder="הזן את שמך הפרטי"
-        onkeydown="if(event.key==='Enter') doSignup()" />
-      <div class="form-error" id="err-name" style="display:none;"></div>
+      <label class="form-label">שם מלא</label>
+      <input type="text" class="form-input" id="signup-name" placeholder="שם פרטי + שם משפחה" autocomplete="off" />
+      <div class="form-hint">לדוגמה: דניאל כהן — השם המלא מזהה אותך בכיתה</div>
+      <div class="form-error" id="err-name">נא להזין שם מלא (שם פרטי + משפחה)</div>
     </div>
     <div class="form-group">
       <label class="form-label">הכיתה שלך</label>
@@ -114,42 +163,40 @@
         <option value="ד3">כיתה ד׳3</option>
         <option value="ה1">כיתה ה׳1</option>
       </select>
-      <div class="form-error" id="err-class" style="display:none;"></div>
+      <div class="form-error" id="err-class">נא לבחור כיתה</div>
     </div>
     <div class="form-group">
       <label class="form-label">סיסמה</label>
       <input type="password" class="form-input" id="signup-pass" placeholder="בחר סיסמה (4+ תווים)" />
-      <div class="form-error" id="err-pass" style="display:none;"></div>
+      <div class="form-error" id="err-pass">הסיסמה חייבת להכיל לפחות 4 תווים</div>
     </div>
     <div class="form-group">
       <label class="form-label">אימות סיסמה</label>
-      <input type="password" class="form-input" id="signup-pass2" placeholder="חזור על הסיסמה"
-        onkeydown="if(event.key==='Enter') doSignup()" />
-      <div class="form-error" id="err-pass2" style="display:none;"></div>
+      <input type="password" class="form-input" id="signup-pass2" placeholder="חזור על הסיסמה" />
+      <div class="form-error" id="err-pass2">הסיסמאות אינן תואמות</div>
     </div>
-    <button class="btn btn-primary btn-full" id="btn-signup" onclick="doSignup()">🚀 צור חשבון</button>
+    <button class="btn btn-primary btn-full" onclick="doSignup()">🚀 צור חשבון</button>
     <div class="auth-switch">כבר יש לך חשבון? <a onclick="showScreen('login')">התחבר כאן</a></div>
     <div class="auth-switch" style="margin-top:8px;"><a onclick="showScreen('landing')" style="color:var(--text-soft);">← חזרה</a></div>
   </div>
 </div>
 
-<!-- LOGIN -->
+<!-- ===================== LOGIN ===================== -->
 <div id="screen-login" class="screen">
   <div class="auth-card fadein">
-    <div class="auth-logo">⭐ סטארקווסט</div>
+    <div class="auth-logo">⭐ סטאר<span>קווסט</span></div>
     <h2 class="auth-title">ברוך הבא חזרה!</h2>
     <p class="auth-sub">התחבר וממשיך לצבור כוכבים ⭐</p>
     <div class="form-group">
-      <label class="form-label">השם שלך</label>
-      <input type="text" class="form-input" id="login-name" placeholder="הזן את שמך" />
+      <label class="form-label">שם מלא</label>
+      <input type="text" class="form-input" id="login-name" placeholder="הזן את שמך המלא" />
     </div>
     <div class="form-group">
       <label class="form-label">סיסמה</label>
-      <input type="password" class="form-input" id="login-pass" placeholder="הזן סיסמה"
-        onkeydown="if(event.key==='Enter') doLogin()" />
+      <input type="password" class="form-input" id="login-pass" placeholder="הזן סיסמה" />
     </div>
-    <div class="form-error" id="err-login" style="display:none;margin-bottom:14px;"></div>
-    <button class="btn btn-primary btn-full" id="btn-login" onclick="doLogin()">⭐ כניסה</button>
+    <div class="form-error" id="err-login" style="display:block;margin-bottom:14px;"></div>
+    <button class="btn btn-primary btn-full" onclick="doLogin()">⭐ כניסה</button>
     <div class="divider">או</div>
     <button class="btn btn-blue btn-full" onclick="demoLogin()">👀 כניסת דמו — ללא חשבון</button>
     <div class="auth-switch" style="margin-top:16px;">משתמש חדש? <a onclick="showScreen('signup')">צור חשבון</a></div>
@@ -157,170 +204,158 @@
   </div>
 </div>
 
-<script src="sq-core.js"></script>
-<script>
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
-// ── On page load: if already logged in, go straight to app ─
-window.addEventListener('load', () => {
-  const session = getSession();
-  if (session) window.location.href = 'app.html';
+<script>
+const SUPABASE_URL = 'https://xyvqlpzlgkyylvxdeiiy.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_BdIEzaevyWXQLBcl7gqMaQ_AvOAjBN_';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── Session ───────────────────────────────────────────────
+function getSession() { try { return JSON.parse(localStorage.getItem('sq_session')) || null; } catch { return null; } }
+function saveSession(u) { localStorage.setItem('sq_session', JSON.stringify(u)); }
+
+// ── Auto-redirect if already logged in ───────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  if (getSession()) window.location.href = 'app.html';
 });
 
-// ── Screen navigation ──────────────────────────────────────
 function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + name).classList.add('active');
-  window.scrollTo(0, 0);
 }
 
-// ── Signup ─────────────────────────────────────────────────
+// ── Initials helper ───────────────────────────────────────
+function getInitials(name) {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) return parts[0][0] + parts[parts.length - 1][0];
+  return parts[0][0];
+}
+
+// ── Validate full name (must have at least two words) ─────
+function isFullName(name) {
+  return name.trim().split(/\s+/).length >= 2;
+}
+
+async function hashPass(pass) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pass + 'starquest_salt'));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function showLoading(msg='טוען...') {
+  let el = document.getElementById('loading-overlay');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'loading-overlay';
+    el.style.cssText = 'position:fixed;inset:0;background:rgba(26,26,46,0.55);z-index:9998;display:flex;align-items:center;justify-content:center;';
+    el.innerHTML = `<div style="background:white;border-radius:16px;padding:28px 40px;font-family:Heebo,sans-serif;font-size:16px;font-weight:800;color:#1A1A2E;">${msg}</div>`;
+    document.body.appendChild(el);
+  } else {
+    el.querySelector('div').textContent = msg;
+    el.style.display = 'flex';
+  }
+}
+function hideLoading() { const el = document.getElementById('loading-overlay'); if (el) el.style.display = 'none'; }
+
 async function doSignup() {
   const name  = document.getElementById('signup-name').value.trim();
   const cls   = document.getElementById('signup-class').value;
   const pass  = document.getElementById('signup-pass').value;
   const pass2 = document.getElementById('signup-pass2').value;
 
-  // Reset errors
-  ['err-name','err-class','err-pass','err-pass2'].forEach(id => {
-    document.getElementById(id).style.display = 'none';
-  });
+  // Validate full name
+  const nameErr = !name || !isFullName(name);
+  document.getElementById('err-name').style.display  = nameErr           ? 'block' : 'none';
+  document.getElementById('err-class').style.display = (!cls)            ? 'block' : 'none';
+  document.getElementById('err-pass').style.display  = (pass.length < 4) ? 'block' : 'none';
+  document.getElementById('err-pass2').style.display = (pass !== pass2)  ? 'block' : 'none';
+  if (nameErr || !cls || pass.length < 4 || pass !== pass2) return;
 
-  let valid = true;
-  if (!name)           { showErr('err-name',  'נא להזין שם');                              valid = false; }
-  if (!cls)            { showErr('err-class', 'נא לבחור כיתה');                            valid = false; }
-  if (pass.length < 4) { showErr('err-pass',  'הסיסמה חייבת להכיל לפחות 4 תווים');        valid = false; }
-  if (pass !== pass2)  { showErr('err-pass2', 'הסיסמאות אינן תואמות');                    valid = false; }
-  if (!valid) return;
-
-  setLoading('btn-signup', true);
   showLoading('יוצר חשבון...');
-
   try {
     const { data: existing } = await sb.from('users').select('id').ilike('name', name).maybeSingle();
     if (existing) {
-      showErr('err-name', 'שם זה כבר קיים — נסה להתחבר');
-      hideLoading();
-      setLoading('btn-signup', false);
-      return;
+      document.getElementById('err-name').textContent = 'שם זה כבר קיים — נסה שם אחר או התחבר';
+      document.getElementById('err-name').style.display = 'block';
+      hideLoading(); return;
     }
     const hash = await hashPass(pass);
     const { data: user, error } = await sb.from('users')
       .insert({ name, class: cls, password_hash: hash })
       .select().single();
     if (error) throw error;
-    await finishLogin(user);
+    saveSession({ id: user.id, name: user.name, cls: user.class, points: 0 });
+    window.location.href = 'app.html';
   } catch(e) {
-    showErr('err-name', 'שגיאה: ' + e.message);
-    hideLoading();
-    setLoading('btn-signup', false);
+    document.getElementById('err-name').textContent = 'שגיאה: ' + e.message;
+    document.getElementById('err-name').style.display = 'block';
   }
+  hideLoading();
 }
 
-// ── Login ──────────────────────────────────────────────────
 async function doLogin() {
   const name  = document.getElementById('login-name').value.trim();
   const pass  = document.getElementById('login-pass').value;
   const errEl = document.getElementById('err-login');
-  errEl.style.display = 'none';
+  if (!name || !pass) { errEl.textContent = '⚠️ נא למלא שם וסיסמה'; errEl.style.display='block'; return; }
 
-  if (!name || !pass) {
-    showErr('err-login', '⚠️ נא למלא שם וסיסמה');
-    return;
-  }
-
-  setLoading('btn-login', true);
   showLoading('מתחבר...');
-
   try {
-    const { data: user, error } = await sb.from('users').select('*').ilike('name', name).maybeSingle();
-    if (error) throw error;
-    if (!user) {
-      showErr('err-login', '⚠️ שם לא נמצא — בדוק שם או צור חשבון חדש');
-      hideLoading();
-      setLoading('btn-login', false);
-      return;
-    }
+    const { data: user } = await sb.from('users').select('*').ilike('name', name).maybeSingle();
+    if (!user) { errEl.textContent = '⚠️ שם לא נמצא — נסה כניסת דמו!'; errEl.style.display='block'; hideLoading(); return; }
     const hash = await hashPass(pass);
-    if (user.password_hash !== hash) {
-      showErr('err-login', '⚠️ סיסמה שגויה');
-      hideLoading();
-      setLoading('btn-login', false);
-      return;
-    }
-    await finishLogin(user);
+    if (user.password_hash !== hash) { errEl.textContent = '⚠️ סיסמה שגויה'; errEl.style.display='block'; hideLoading(); return; }
+    errEl.textContent = ''; errEl.style.display='none';
+    // Load progress for total points
+    const { data: rows } = await sb.from('progress').select('*').eq('user_id', user.id);
+    const totalPoints = (rows || []).reduce((s, r) => s + (r.points || 0), 0);
+    saveSession({ id: user.id, name: user.name, cls: user.class, points: totalPoints });
+    sb.from('sessions').insert({ user_id: user.id }).then(() => {});
+    window.location.href = 'app.html';
   } catch(e) {
-    showErr('err-login', 'שגיאה: ' + e.message);
-    hideLoading();
-    setLoading('btn-login', false);
+    errEl.textContent = 'שגיאה: ' + e.message; errEl.style.display='block';
   }
+  hideLoading();
 }
 
-// ── Demo login ─────────────────────────────────────────────
 async function demoLogin() {
   showLoading('טוען דמו...');
   try {
-    let { data: user } = await sb.from('users').select('*').eq('name', 'דניאל-דמו').maybeSingle();
+    let { data: user } = await sb.from('users').select('*').eq('name', 'דניאל כהן-דמו').maybeSingle();
     if (!user) {
       const hash = await hashPass('demo1234');
       const { data: newUser, error } = await sb.from('users')
-        .insert({ name: 'דניאל-דמו', class: 'ד2', password_hash: hash })
+        .insert({ name: 'דניאל כהן-דמו', class: 'ד2', password_hash: hash })
         .select().single();
       if (error) throw error;
       user = newUser;
-      await sb.from('progress').upsert({
-        user_id: user.id, topic_id: 'noshe7',
-        score: 85, stars: 2, points: 85, attempts: 1
-      }, { onConflict: 'user_id,topic_id' });
+      await sb.from('progress').upsert({ user_id: user.id, topic_id: 'noshe7', score: 85, stars: 2, points: 85, attempts: 1 });
     }
-    // Show as דניאל in the app
-    await finishLogin({ ...user, name: 'דניאל' });
-  } catch(e) {
-    hideLoading();
-    showErr('err-login', 'שגיאה בכניסת דמו: ' + e.message);
-    showScreen('login');
-  }
-}
-
-// ── Shared: finish login → save session → redirect ─────────
-async function finishLogin(user) {
-  try {
-    const progress = await loadProgress(user.id);
-    const { totalPoints } = computeTotals(progress);
-
-    saveSession({
-      id:     user.id,
-      name:   user.name,
-      cls:    user.class,
-      points: totalPoints
-    });
-
-    // Log session — fire and forget
-    sb.from('sessions').insert({ user_id: user.id }).then(() => {});
-
+    const { data: rows } = await sb.from('progress').select('*').eq('user_id', user.id);
+    const totalPoints = (rows || []).reduce((s, r) => s + (r.points || 0), 0);
+    saveSession({ id: user.id, name: user.name, cls: user.class, points: totalPoints });
     window.location.href = 'app.html';
   } catch(e) {
-    hideLoading();
-    showErr('err-login', 'שגיאת התחברות: ' + e.message);
-    showScreen('login');
+    showToast('שגיאה בכניסת דמו: ' + e.message);
   }
+  hideLoading();
 }
 
-// ── Helpers ─────────────────────────────────────────────────
-function showErr(id, msg) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.textContent = msg;
-  el.style.display = 'block';
+// ── Toast ──────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-function setLoading(btnId, loading) {
-  const btn = document.getElementById(btnId);
-  if (!btn) return;
-  btn.disabled = loading;
-  if (loading) btn.style.opacity = '0.6';
-  else btn.style.opacity = '1';
-}
-
+// Enter key on login
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('login-pass').addEventListener('keydown',   e => { if(e.key==='Enter') doLogin(); });
+  document.getElementById('signup-pass2').addEventListener('keydown', e => { if(e.key==='Enter') doSignup(); });
+});
 </script>
 </body>
 </html>

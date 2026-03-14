@@ -18,59 +18,35 @@
 }
 .chapter-header::before {
   content: ''; position: absolute; inset: 0;
-  background-image:
-    radial-gradient(circle at 10% 50%, rgba(245,197,24,0.08) 0%, transparent 60%),
-    radial-gradient(circle at 90% 20%, rgba(45,107,228,0.15) 0%, transparent 50%);
+  background-image: radial-gradient(circle at 10% 50%, rgba(245,197,24,0.08) 0%, transparent 60%),
+                    radial-gradient(circle at 90% 20%, rgba(45,107,228,0.15) 0%, transparent 50%);
   pointer-events: none;
 }
 .chapter-info { position: relative; z-index: 1; }
-.chapter-badge {
-  display: inline-block; background: rgba(245,197,24,0.2); border: 1px solid rgba(245,197,24,0.4);
-  color: var(--gold); font-size: 12px; font-weight: 800; padding: 4px 12px; border-radius: 100px; margin-bottom: 10px;
-}
+.chapter-badge { display: inline-block; background: rgba(245,197,24,0.2); border: 1px solid rgba(245,197,24,0.4); color: var(--gold); font-size: 12px; font-weight: 800; padding: 4px 12px; border-radius: 100px; margin-bottom: 10px; }
 .chapter-title { font-size: 20px; font-weight: 900; color: white; margin-bottom: 6px; }
 .chapter-sub { font-size: 14px; color: rgba(255,255,255,0.6); font-weight: 500; }
 .chapter-progress-wrap { position: relative; z-index: 1; text-align: center; }
-.chapter-ring {
-  width: 80px; height: 80px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center; position: relative;
-}
+.chapter-ring { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
 .chapter-ring::before { content: ''; position: absolute; inset: 8px; border-radius: 50%; background: var(--navy); }
 .chapter-ring-inner { position: relative; z-index: 1; font-size: 18px; font-weight: 900; color: var(--gold); }
 .chapter-ring-label { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 8px; font-weight: 700; }
 
-.stars-banner {
-  background: white; border-radius: var(--radius); padding: 16px 24px; margin-bottom: 24px;
-  display: flex; align-items: center; justify-content: space-between;
-  box-shadow: var(--shadow); border: 2px solid var(--border);
-}
+.stars-banner { background: white; border-radius: var(--radius); padding: 16px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow); border: 2px solid var(--border); }
 .stars-banner-left { display: flex; align-items: center; gap: 12px; }
 .stars-total { font-size: 26px; font-weight: 900; color: var(--gold-dark); }
 
-.connector {
-  width: 3px; height: 40px; margin: 0 auto; position: relative; z-index: 0;
-  transition: background 0.4s; background: var(--border);
-}
+.connector { width: 3px; height: 40px; margin: 0 auto; position: relative; z-index: 0; transition: background 0.4s; background: var(--border); }
 .connector.done   { background: linear-gradient(180deg, var(--gold), var(--gold-dark)); }
 .connector.active { background: linear-gradient(180deg, var(--blue), var(--blue-light)); }
 
 .level-row { display: flex; align-items: center; gap: 16px; }
-.level-node {
-  width: 52px; height: 52px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px; flex-shrink: 0; border: 3px solid var(--border);
-  background: white; transition: all 0.2s; position: relative; z-index: 1;
-}
+.level-node { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; border: 3px solid var(--border); background: white; transition: all 0.2s; position: relative; z-index: 1; }
 .level-node.done   { background: var(--gold); border-color: var(--gold-dark); box-shadow: 0 0 0 4px rgba(245,197,24,0.2); }
 .level-node.active { background: var(--blue); border-color: var(--blue-dark); box-shadow: 0 0 0 6px rgba(45,107,228,0.2); animation: pulse 2s infinite; }
 .level-node.locked { background: #f1f5f9; border-color: #cbd5e1; }
 
-.level-card {
-  flex: 1; background: white; border-radius: var(--radius); padding: 18px 22px;
-  border: 2px solid var(--border); cursor: pointer; transition: all 0.2s;
-  display: flex; align-items: center; justify-content: space-between;
-  box-shadow: var(--shadow); position: relative; overflow: hidden;
-}
+.level-card { flex: 1; background: white; border-radius: var(--radius); padding: 18px 22px; border: 2px solid var(--border); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow); position: relative; overflow: hidden; }
 .level-card:hover:not(.locked-card) { border-color: var(--blue); transform: translateX(-3px); box-shadow: var(--shadow-lg); }
 .level-card.done-card   { border-color: rgba(245,197,24,0.4); background: linear-gradient(135deg,#fffbeb,white); }
 .level-card.active-card { border-color: var(--blue); background: linear-gradient(135deg,var(--blue-light),white); }
@@ -94,21 +70,11 @@
 .level-btn.btn-retry  { background: rgba(245,197,24,0.15); color: var(--gold-dark); border: 1px solid rgba(245,197,24,0.4); }
 .level-btn.btn-retry:hover  { background: rgba(245,197,24,0.25); }
 .level-btn.btn-locked { background: #f1f5f9; color: #94a3b8; cursor: default; }
-.chapter-locked {
-  background: #f8fafc; border-radius: 14px; border: 2px dashed #cbd5e1;
-  padding: 24px; text-align: center; margin-top: 32px; color: var(--locked); font-weight: 700; font-size: 14px;
-}
+.chapter-locked { background: #f8fafc; border-radius: 14px; border: 2px dashed #cbd5e1; padding: 24px; text-align: center; margin-top: 32px; color: var(--locked); font-weight: 700; font-size: 14px; }
 
-.lm-modal-overlay {
-  display: none; position: fixed; inset: 0; background: rgba(26,26,46,0.7);
-  z-index: 200; align-items: center; justify-content: center; padding: 24px;
-}
+.lm-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(26,26,46,0.7); z-index: 200; align-items: center; justify-content: center; padding: 24px; }
 .lm-modal-overlay.show { display: flex; }
-.lm-modal {
-  background: white; border-radius: 20px; padding: 32px; max-width: 420px;
-  width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;
-  animation: slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1);
-}
+.lm-modal { background: white; border-radius: 20px; padding: 32px; max-width: 420px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center; animation: slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1); }
 .lm-modal-emoji  { font-size: 52px; margin-bottom: 12px; }
 .lm-modal-title  { font-size: 22px; font-weight: 900; color: var(--navy); margin-bottom: 6px; }
 .lm-modal-sub    { font-size: 14px; color: var(--text-soft); margin-bottom: 20px; }
@@ -125,23 +91,36 @@
 @media (max-width: 768px) {
   .lm-main { padding: 20px 14px 60px; }
   .chapter-header { flex-direction: column; gap: 16px; }
+  .level-title { font-size: 14px; }
+  .level-card { padding: 14px 16px; }
 }
 </style>
 </head>
 <body>
 
 <nav class="topnav">
-  <div class="nav-logo">⭐ סטארקווסט</div>
+  <a class="nav-logo" href="app.html">⭐ סטאר<span>קווסט</span></a>
   <div class="nav-links">
     <button class="nav-link" onclick="window.location.href='app.html'">🏠 בית</button>
     <button class="nav-link active">📝 דפי עבודה</button>
     <button class="nav-link" onclick="window.location.href='app.html#leaderboard'">🏆 דירוג</button>
+    <button class="nav-link" onclick="window.location.href='app.html#profile'">👤 פרופיל</button>
   </div>
   <div class="nav-right">
-    <div class="nav-points" id="nav-points">⭐ 0 נק׳</div>
-    <div class="nav-avatar" id="nav-avatar">?</div>
+    <div class="nav-points" id="nav-points" onclick="window.location.href='app.html#leaderboard'" title="לחץ לדירוג">⭐ 0 נק׳</div>
+    <div class="nav-avatar" id="nav-avatar" onclick="window.location.href='app.html#profile'" title="לחץ לפרופיל">?</div>
   </div>
+  <button class="hamburger" id="hamburger" onclick="toggleDrawer()" aria-label="תפריט">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<div class="mobile-drawer" id="mobile-drawer">
+  <button class="nav-link" onclick="window.location.href='app.html'">🏠 בית</button>
+  <button class="nav-link active">📝 דפי עבודה</button>
+  <button class="nav-link" onclick="window.location.href='app.html#leaderboard'">🏆 דירוג</button>
+  <button class="nav-link" onclick="window.location.href='app.html#profile'">👤 פרופיל</button>
+</div>
 
 <div class="lm-main">
   <div class="stars-banner">
@@ -152,7 +131,7 @@
         <div style="font-size:13px;color:var(--text-soft);font-weight:600;">מתוך 21 אפשריים בפרק א׳</div>
       </div>
     </div>
-    <a href="app.html" style="font-size:13px;font-weight:800;color:var(--text-soft);text-decoration:none;">← חזרה ללוח הבקרה</a>
+    <a href="app.html" style="font-size:13px;font-weight:800;color:var(--text-soft);text-decoration:none;padding:8px 14px;border-radius:10px;border:2px solid var(--border);">← חזרה ללוח הבקרה</a>
   </div>
 
   <div class="chapter-header">
@@ -178,7 +157,6 @@
   </div>
 </div>
 
-<!-- Modal -->
 <div class="lm-modal-overlay" id="lm-modal" onclick="closeLMModal(event)">
   <div class="lm-modal">
     <div class="lm-modal-emoji"  id="lm-modal-emoji">📝</div>
@@ -194,15 +172,25 @@
 const session = requireAuth();
 let progress = {};
 
-// ── Topic order: noshe1 → noshe7 (correct curriculum order) ──
+function getInitials(name) {
+  const parts = (name || '').trim().split(/\s+/);
+  if (parts.length >= 2) return parts[0][0] + parts[parts.length - 1][0];
+  return (parts[0] || '?')[0];
+}
+
+function toggleDrawer() {
+  document.getElementById('mobile-drawer').classList.toggle('open');
+  document.getElementById('hamburger').classList.toggle('open');
+}
+
 const LEVELS = [
-  { id:'noshe1', num:'נושא 1', title:'כפל ב-10, ב-100 וב-1,000',                    questions:24, minutes:15, worksheet:'worksheet.html?topic=noshe1' },
-  { id:'noshe2', num:'נושא 2', title:'כפל בעשרות שלמות, במאות שלמות ובאלפים שלמים', questions:26, minutes:15, worksheet:'worksheet.html?topic=noshe2' },
-  { id:'noshe3', num:'נושא 3', title:'חילוק במחלק חד-ספרתי ב-10, ב-100 וב-1,000',  questions:18, minutes:10, worksheet: null },
-  { id:'noshe4', num:'נושא 4', title:'חילוק בעשרות שלמות ובמאות שלמות',             questions:20, minutes:12, worksheet: null },
-  { id:'noshe5', num:'נושא 5', title:'הקשר בין כפל לבין חילוק',                      questions:16, minutes:10, worksheet: null },
-  { id:'noshe6', num:'נושא 6', title:'סדר פעולות החשבון ושימוש בסוגריים',            questions:18, minutes:12, worksheet: null },
-  { id:'noshe7', num:'נושא 7', title:'תכונות ה-0 וה-1',                              questions:20, minutes:15, worksheet:'worksheet.html?topic=noshe7' },
+  { id:'noshe7', num:'נושא 7', title:'תכונות ה-0 וה-1',                             questions:20, minutes:15, worksheet:'worksheet.html?topic=noshe7' },
+  { id:'noshe6', num:'נושא 6', title:'סדר פעולות החשבון ושימוש בסוגריים',           questions:18, minutes:12, worksheet: null },
+  { id:'noshe5', num:'נושא 5', title:'הקשר בין כפל לבין חילוק',                     questions:16, minutes:10, worksheet: null },
+  { id:'noshe4', num:'נושא 4', title:'חילוק בעשרות שלמות ובמאות שלמות',            questions:20, minutes:12, worksheet: null },
+  { id:'noshe3', num:'נושא 3', title:'חילוק במחלק חד-ספרתי ב-10, ב-100 וב-1,000', questions:18, minutes:10, worksheet: null },
+  { id:'noshe2', num:'נושא 2', title:'כפל בעשרות שלמות ובמאות שלמות',              questions:20, minutes:12, worksheet: null },
+  { id:'noshe1', num:'נושא 1', title:'כפל ב-10, ב-100 וב-1,000',                   questions:18, minutes:10, worksheet: null },
 ];
 
 function getLevelState(levelId) {
@@ -220,7 +208,7 @@ async function init() {
   progress = await loadProgress(session.id);
   const { totalPoints, totalStars, doneCount } = computeTotals(progress);
 
-  document.getElementById('nav-avatar').textContent  = session.name[0];
+  document.getElementById('nav-avatar').textContent  = getInitials(session.name);
   document.getElementById('nav-points').textContent  = '⭐ ' + totalPoints + ' נק׳';
   document.getElementById('lm-stars-total').textContent = '⭐ ' + totalStars;
   document.getElementById('lm-ring-inner').textContent  = doneCount + '/7';
@@ -325,11 +313,8 @@ function openModal(id) {
 function startLevel(id) {
   const level = LEVELS.find(l => l.id === id);
   document.getElementById('lm-modal').classList.remove('show');
-  if (level && level.worksheet) {
-    window.location.href = level.worksheet;
-  } else {
-    showToast('🚀 נושא זה יהיה זמין בקרוב!');
-  }
+  if (level && level.worksheet) window.location.href = level.worksheet;
+  else showToast('🚀 נושא זה יהיה זמין בקרוב!');
 }
 
 function closeLMModal(e) {

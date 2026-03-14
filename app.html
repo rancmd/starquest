@@ -14,21 +14,18 @@
 .section-title { font-size: 22px; font-weight: 900; color: var(--navy); margin-bottom: 6px; }
 .section-sub { font-size: 14px; color: var(--text-soft); margin-bottom: 24px; font-weight: 500; }
 
-/* Stats */
 .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 32px; }
 .stat-card { background: white; border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); text-align: center; }
+.stat-card.clickable { cursor: pointer; transition: all 0.2s; }
+.stat-card.clickable:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border: 2px solid var(--blue-light); }
 .stat-label { font-size: 12px; font-weight: 800; color: var(--text-soft); margin-bottom: 8px; }
 .stat-value { font-size: 28px; font-weight: 900; color: var(--navy); }
 .stat-value.gold { color: var(--gold-dark); }
 .stat-value.blue { color: var(--blue); }
 .stat-sub { font-size: 11px; color: var(--text-soft); margin-top: 4px; font-weight: 600; }
 
-/* Worksheet cards */
 .worksheets-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
-.worksheet-card {
-  background: white; border-radius: var(--radius); padding: 20px;
-  box-shadow: var(--shadow); cursor: pointer; border: 2px solid transparent; transition: all 0.2s;
-}
+.worksheet-card { background: white; border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
 .worksheet-card:hover { border-color: var(--blue); transform: translateY(-3px); box-shadow: var(--shadow-lg); }
 .ws-subject { font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 100px; margin-bottom: 10px; display: inline-block; }
 .ws-subject.math { background: #e8f0fd; color: var(--blue); }
@@ -38,16 +35,10 @@
 .ws-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
 .ws-points { font-size: 13px; font-weight: 800; color: var(--gold-dark); }
 
-/* Filter */
 .subject-filter { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-.filter-btn {
-  padding: 8px 16px; border-radius: 100px; font-family: 'Heebo',sans-serif;
-  font-size: 13px; font-weight: 800; border: 2px solid var(--border);
-  background: white; cursor: pointer; transition: all 0.2s; color: var(--text-soft);
-}
+.filter-btn { padding: 8px 16px; border-radius: 100px; font-family: 'Heebo',sans-serif; font-size: 13px; font-weight: 800; border: 2px solid var(--border); background: white; cursor: pointer; transition: all 0.2s; color: var(--text-soft); }
 .filter-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
 
-/* Leaderboard */
 .leaderboard-table { background: white; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
 .lb-row { display: grid; grid-template-columns: 60px 1fr 100px 60px; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--border); }
 .lb-row.header { background: var(--navy); color: white; font-size: 13px; font-weight: 800; }
@@ -57,13 +48,12 @@
 .lb-row.me { border: 2px solid var(--blue); border-radius: 8px; }
 .lb-rank { font-size: 20px; }
 .lb-name { display: flex; align-items: center; gap: 10px; font-weight: 700; }
-.lb-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--border); color: var(--text-soft); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; }
+.lb-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--border); color: var(--text-soft); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; letter-spacing: -1px; }
 .lb-points { font-size: 18px; font-weight: 900; color: var(--navy); }
 .lb-badge { font-size: 20px; text-align: center; }
 
-/* Profile */
 .profile-top { display: flex; gap: 24px; background: white; border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); margin-bottom: 28px; align-items: center; }
-.profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--blue); color: white; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; flex-shrink: 0; }
+.profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--blue); color: white; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 900; flex-shrink: 0; letter-spacing: -2px; }
 .profile-info h2 { font-size: 22px; font-weight: 900; color: var(--navy); margin-bottom: 4px; }
 .profile-info p { color: var(--text-soft); font-size: 14px; font-weight: 600; }
 .badges-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
@@ -78,13 +68,16 @@
   .worksheets-grid { grid-template-columns: 1fr; }
   .badges-grid { grid-template-columns: 1fr 1fr; }
   .dash-content { padding: 20px 14px 60px; }
+  .lb-row { grid-template-columns: 44px 1fr 80px 40px; padding: 12px 14px; }
+  .profile-top { flex-direction: column; text-align: center; }
+  .profile-info div { justify-content: center; }
 }
 </style>
 </head>
 <body>
 
 <nav class="topnav">
-  <div class="nav-logo">⭐ סטארקווסט</div>
+  <a class="nav-logo" href="app.html">⭐ סטאר<span>קווסט</span></a>
   <div class="nav-links">
     <button class="nav-link active" onclick="showDash('home')" id="nav-home">🏠 בית</button>
     <button class="nav-link" onclick="showDash('worksheets')" id="nav-worksheets">📝 דפי עבודה</button>
@@ -93,10 +86,24 @@
   </div>
   <div class="nav-right">
     <button class="btn-logout" onclick="logout()">יציאה</button>
-    <div class="nav-points" id="nav-points">⭐ 0 נק׳</div>
-    <div class="nav-avatar" id="nav-avatar">?</div>
+    <div class="nav-points" id="nav-points" onclick="showDash('leaderboard')" title="לחץ לדירוג">⭐ 0 נק׳</div>
+    <div class="nav-avatar" id="nav-avatar" onclick="showDash('profile')" title="לחץ לפרופיל">?</div>
   </div>
+  <!-- Hamburger -->
+  <button class="hamburger" id="hamburger" onclick="toggleDrawer()" aria-label="תפריט">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<!-- Mobile drawer -->
+<div class="mobile-drawer" id="mobile-drawer">
+  <button class="nav-link" onclick="showDash('home');closeDrawer()">🏠 בית</button>
+  <button class="nav-link" onclick="showDash('worksheets');closeDrawer()">📝 דפי עבודה</button>
+  <button class="nav-link" onclick="showDash('leaderboard');closeDrawer()">🏆 דירוג</button>
+  <button class="nav-link" onclick="showDash('profile');closeDrawer()">👤 פרופיל</button>
+  <div class="mobile-drawer-sep"></div>
+  <button class="btn-logout" onclick="logout()">יציאה</button>
+</div>
 
 <div style="display:flex;flex-direction:column;min-height:calc(100vh - 64px);">
 <div class="dash-content">
@@ -107,7 +114,7 @@
     <p class="section-sub">כך נראית ההתקדמות שלך</p>
     <div class="stats-row">
       <div class="stat-card"><div class="stat-label">⭐ סה״כ נקודות</div><div class="stat-value gold" id="stat-points">0</div><div class="stat-sub">בהצלחה!</div></div>
-      <div class="stat-card"><div class="stat-label">🏆 מיקום בכיתה</div><div class="stat-value blue" id="stat-rank">#—</div><div class="stat-sub">מתוך התלמידים</div></div>
+      <div class="stat-card clickable" onclick="showDash('leaderboard')" title="לחץ לדירוג"><div class="stat-label">🏆 מיקום בכיתה</div><div class="stat-value blue" id="stat-rank">#—</div><div class="stat-sub">לחץ לדירוג →</div></div>
       <div class="stat-card"><div class="stat-label">📝 נושאים הושלמו</div><div class="stat-value" id="stat-done">0</div><div class="stat-sub">התחל עכשיו!</div></div>
       <div class="stat-card"><div class="stat-label">⭐ כוכבים</div><div class="stat-value" id="stat-stars">0</div><div class="stat-sub">מתוך 21 בפרק א׳</div></div>
     </div>
@@ -209,18 +216,36 @@
 const session = requireAuth();
 let progress = {};
 
+// ── Initials helper ───────────────────────────────────────
+function getInitials(name) {
+  const parts = (name || '').trim().split(/\s+/);
+  if (parts.length >= 2) return parts[0][0] + parts[parts.length - 1][0];
+  return (parts[0] || '?')[0];
+}
+
+// ── Hamburger / drawer ────────────────────────────────────
+function toggleDrawer() {
+  const drawer = document.getElementById('mobile-drawer');
+  const ham    = document.getElementById('hamburger');
+  const open   = drawer.classList.toggle('open');
+  ham.classList.toggle('open', open);
+}
+function closeDrawer() {
+  document.getElementById('mobile-drawer').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+}
+
 async function init() {
   progress = await loadProgress(session.id);
   const { totalPoints, totalStars, doneCount } = computeTotals(progress);
-
-  // Update session points
   session.points = totalPoints;
   saveSession(session);
 
+  const initials = getInitials(session.name);
   const hour = new Date().getHours();
   const greet = hour < 12 ? 'בוקר טוב' : hour < 17 ? 'צהריים טובים' : 'ערב טוב';
   document.getElementById('dash-greeting').textContent = greet + ', ' + session.name + '! 👋';
-  document.getElementById('nav-avatar').textContent    = session.name[0];
+  document.getElementById('nav-avatar').textContent    = initials;
   document.getElementById('nav-points').textContent   = '⭐ ' + totalPoints + ' נק׳';
 
   document.getElementById('stat-points').textContent = totalPoints;
@@ -231,7 +256,7 @@ async function init() {
 
   // Leaderboard
   const { data: lb } = await sb.from('leaderboard').select('*').order('rank');
-  const me = (lb || []).find(r => r.id === session.id);
+  const me   = (lb || []).find(r => r.id === session.id);
   const rank = me ? me.rank : '—';
 
   document.getElementById('stat-rank').textContent      = '#' + rank;
@@ -244,9 +269,10 @@ async function init() {
     const rankLabel = i < 3 ? medals[i] : `<span style="font-size:15px;">${r.rank}</span>`;
     const avatarStyle = isMe ? 'background:var(--blue);color:white;' : '';
     const rowClass = ['lb-row', i===0?'top-1':i===1?'top-2':i===2?'top-3':'', isMe?'me':''].filter(Boolean).join(' ');
+    const ini = getInitials(r.name);
     return `<div class="${rowClass}">
       <div class="lb-rank">${rankLabel}</div>
-      <div class="lb-name"><div class="lb-avatar" style="${avatarStyle}">${r.name[0]}</div>${r.name}${isMe?' (אתה)':''}</div>
+      <div class="lb-name"><div class="lb-avatar" style="${avatarStyle}">${ini}</div>${r.name}${isMe?' (אתה)':''}</div>
       <div class="lb-points" ${isMe?'style="color:var(--blue);"':''}>${r.total_points}</div>
       <div class="lb-badge">${badgeIcons[i]||''}</div>
     </div>`;
@@ -255,15 +281,13 @@ async function init() {
   document.getElementById('lb-rows').innerHTML = rowsHtml ||
     '<div style="padding:20px;text-align:center;color:var(--text-soft);">אין תלמידים עדיין</div>';
 
-  // Profile
   document.getElementById('profile-name').textContent   = session.name;
-  document.getElementById('profile-avatar').textContent = session.name[0];
+  document.getElementById('profile-avatar').textContent = initials;
   document.getElementById('profile-class').textContent  = 'כיתה ' + session.cls + ' · מקום #' + rank;
   document.getElementById('profile-points').textContent = totalPoints;
   document.getElementById('profile-done').textContent   = doneCount;
   document.getElementById('profile-stars').textContent  = totalStars;
 
-  // Badges
   if (doneCount >= 1) document.getElementById('badge-first').classList.add('earned');
   if (Object.values(progress).some(p => p.score === 100)) document.getElementById('badge-perfect').classList.add('earned');
   if (totalStars >= 21) document.getElementById('badge-allstars').classList.add('earned');
@@ -275,6 +299,7 @@ function showDash(section) {
   document.getElementById('dash-' + section).classList.add('active');
   const navEl = document.getElementById('nav-' + section);
   if (navEl) navEl.classList.add('active');
+  closeDrawer();
 }
 
 function filterWS(btn, subject) {
@@ -285,12 +310,12 @@ function filterWS(btn, subject) {
   });
 }
 
-function logout() {
-  clearSession();
-  window.location.href = 'index.html';
-}
+function logout() { clearSession(); window.location.href = 'index.html'; }
 
-// Check for toast message from other pages
+// Hash-based tab navigation from other pages (e.g. app.html#leaderboard)
+const hash = location.hash.replace('#','');
+if (['home','worksheets','leaderboard','profile'].includes(hash)) showDash(hash);
+
 const msg = sessionStorage.getItem('sq_toast');
 if (msg) { sessionStorage.removeItem('sq_toast'); setTimeout(() => showToast(msg), 400); }
 

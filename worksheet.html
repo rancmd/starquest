@@ -10,20 +10,14 @@
 <style>
 .ws-main { max-width: 860px; margin: 0 auto; padding: 32px 24px 80px; }
 
-.ws-header {
-  background: white; border-radius: 20px; padding: 28px 32px; margin-bottom: 28px;
-  box-shadow: var(--shadow); border-top: 5px solid var(--blue);
-}
+.ws-header { background: white; border-radius: 20px; padding: 28px 32px; margin-bottom: 28px; box-shadow: var(--shadow); border-top: 5px solid var(--blue); }
 .ws-meta-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
 .ws-badge { padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 800; background: var(--blue-light); color: var(--blue); }
 .ws-badge.chapter { background: #fef9c3; color: #a16207; }
 .ws-title-big { font-size: 24px; font-weight: 900; color: var(--navy); margin-bottom: 6px; }
 .ws-sub-text { font-size: 14px; color: var(--text-soft); font-weight: 500; }
 
-.progress-wrap {
-  background: white; border-radius: 14px; padding: 16px 24px; margin-bottom: 28px;
-  display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow);
-}
+.progress-wrap { background: white; border-radius: 14px; padding: 16px 24px; margin-bottom: 28px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow); }
 .progress-label { font-size: 13px; font-weight: 800; color: var(--text-soft); white-space: nowrap; }
 .progress-bar-bg { flex: 1; height: 10px; background: var(--border); border-radius: 100px; overflow: hidden; }
 .progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--blue),#60a5fa); border-radius: 100px; transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1); width: 0%; }
@@ -31,69 +25,42 @@
 
 .section-card { background: white; border-radius: var(--radius); padding: 26px 28px; margin-bottom: 20px; box-shadow: var(--shadow); border: 2px solid transparent; }
 .section-title-row { display: flex; align-items: flex-start; margin-bottom: 20px; }
-.section-num-badge {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 28px; height: 28px; border-radius: 50%; background: var(--blue); color: white;
-  font-size: 13px; font-weight: 900; margin-left: 10px; flex-shrink: 0;
-}
+.section-num-badge { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: var(--blue); color: white; font-size: 13px; font-weight: 900; margin-left: 10px; flex-shrink: 0; }
 .section-title-text { font-size: 16px; font-weight: 700; color: var(--navy); line-height: 1.5; }
 .section-subtitle { font-size: 13px; color: var(--text-soft); margin-top: 4px; font-weight: 500; }
 .q-grid { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
-.q-box {
-  background: var(--bg); border-radius: 12px; padding: 16px 18px;
-  border: 2px solid var(--border); transition: all 0.2s; position: relative;
-}
+.q-box { background: var(--bg); border-radius: 12px; padding: 16px 18px; border: 2px solid var(--border); transition: all 0.2s; position: relative; }
 .q-box.correct { border-color: var(--success); background: var(--success-bg); }
 .q-box.wrong   { border-color: var(--error);   background: var(--error-bg); }
-.q-num-badge {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 22px; height: 22px; border-radius: 50%; background: var(--border);
-  color: var(--text-soft); font-size: 11px; font-weight: 900; margin-bottom: 10px;
-}
+.q-num-badge { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--border); color: var(--text-soft); font-size: 11px; font-weight: 900; margin-bottom: 10px; }
 .q-box.correct .q-num-badge { background: var(--success); color: white; }
 .q-box.wrong   .q-num-badge { background: var(--error);   color: white; }
 .fb-icon { position: absolute; top: 10px; left: 10px; font-size: 18px; display: none; }
 .q-box.correct .fb-icon, .q-box.wrong .fb-icon { display: block; }
 
 .expr { font-size: 20px; font-weight: 800; color: var(--navy); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; direction: ltr; justify-content: center; margin: 8px 0; }
-.answer-input {
-  width: 70px; height: 40px; border: 2px solid var(--blue); border-radius: 8px;
-  background: white; font-family: 'Heebo',sans-serif; font-size: 18px; font-weight: 800;
-  color: var(--navy); text-align: center; outline: none; transition: all 0.2s;
-}
+.answer-input { width: 70px; height: 40px; border: 2px solid var(--blue); border-radius: 8px; background: white; font-family: 'Heebo',sans-serif; font-size: 18px; font-weight: 800; color: var(--navy); text-align: center; outline: none; transition: all 0.2s; -webkit-user-select: text; user-select: text; }
 .answer-input:focus { border-color: var(--blue-dark); box-shadow: 0 0 0 3px rgba(45,107,228,0.15); }
 .answer-input:disabled { background: var(--bg); cursor: default; }
 .q-box.correct .answer-input { border-color: var(--success); background: var(--success-bg); color: var(--success); }
 .q-box.wrong   .answer-input { border-color: var(--error);   background: var(--error-bg);   color: var(--error); }
-.q-box.correct .compare-input { border-color: var(--success); background: var(--success-bg); color: var(--success); }
-.q-box.wrong   .compare-input { border-color: var(--error);   background: var(--error-bg);   color: var(--error); }
 
 .compare-row { display: flex; align-items: center; justify-content: center; gap: 10px; direction: ltr; }
 .compare-sides { font-size: 18px; font-weight: 800; color: var(--navy); white-space: nowrap; }
-.compare-input {
-  width: 52px; height: 40px; border: 2px solid var(--blue); border-radius: 8px;
-  background: white; font-family: 'Heebo',sans-serif; font-size: 20px; font-weight: 900;
-  color: var(--navy); text-align: center; outline: none; transition: all 0.2s;
-}
+.compare-input { width: 52px; height: 40px; border: 2px solid var(--blue); border-radius: 8px; background: white; font-family: 'Heebo',sans-serif; font-size: 20px; font-weight: 900; color: var(--navy); text-align: center; outline: none; transition: all 0.2s; -webkit-user-select: text; user-select: text; }
 .compare-input:focus { border-color: var(--blue-dark); box-shadow: 0 0 0 3px rgba(45,107,228,0.15); }
 .compare-input:disabled { background: var(--bg); cursor: default; }
+.q-box.correct .compare-input { border-color: var(--success); background: var(--success-bg); color: var(--success); }
+.q-box.wrong   .compare-input { border-color: var(--error);   background: var(--error-bg);   color: var(--error); }
 .correct-answer { font-size: 12px; color: var(--error); font-weight: 700; margin-top: 6px; text-align: center; display: none; direction: rtl; }
 .q-box.wrong .correct-answer { display: block; }
 
 .submit-wrap { text-align: center; padding: 32px 0 16px; }
-.btn-submit {
-  background: var(--gold); color: var(--navy); border: none; border-radius: 14px;
-  padding: 16px 48px; font-family: 'Heebo',sans-serif; font-size: 18px; font-weight: 900;
-  cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 20px rgba(245,197,24,0.4);
-}
+.btn-submit { background: var(--gold); color: var(--navy); border: none; border-radius: 14px; padding: 16px 48px; font-family: 'Heebo',sans-serif; font-size: 18px; font-weight: 900; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 20px rgba(245,197,24,0.4); }
 .btn-submit:hover { background: var(--gold-dark); transform: translateY(-2px); }
 .btn-submit:disabled { background: var(--border); color: var(--text-soft); cursor: default; box-shadow: none; transform: none; }
 
-.results-panel {
-  background: white; border-radius: 20px; padding: 36px; margin-top: 28px;
-  box-shadow: var(--shadow-lg); text-align: center; display: none;
-  border-top: 5px solid var(--gold);
-}
+.results-panel { background: white; border-radius: 20px; padding: 36px; margin-top: 28px; box-shadow: var(--shadow-lg); text-align: center; display: none; border-top: 5px solid var(--gold); }
 .results-panel.show { display: block; }
 .results-emoji { font-size: 56px; margin-bottom: 16px; }
 .results-title { font-size: 26px; font-weight: 900; color: var(--navy); margin-bottom: 8px; }
@@ -110,38 +77,42 @@
 .stat-pill-val.green-v { color: var(--success); }
 .stat-pill-label { font-size: 12px; color: var(--text-soft); font-weight: 700; margin-top: 6px; }
 .results-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-.btn-back-map {
-  background: var(--blue); color: white; border: none; border-radius: 12px;
-  padding: 14px 28px; font-family: 'Heebo',sans-serif; font-size: 16px; font-weight: 800;
-  cursor: pointer; transition: all 0.2s;
-}
+.btn-back-map { background: var(--blue); color: white; border: none; border-radius: 12px; padding: 14px 28px; font-family: 'Heebo',sans-serif; font-size: 16px; font-weight: 800; cursor: pointer; transition: all 0.2s; }
 .btn-back-map:hover { background: var(--blue-dark); transform: translateY(-2px); }
-.btn-retry-ws {
-  background: var(--bg); color: var(--text-soft); border: 2px solid var(--border);
-  border-radius: 12px; padding: 14px 28px; font-family: 'Heebo',sans-serif;
-  font-size: 16px; font-weight: 800; cursor: pointer; transition: all 0.2s;
-}
+.btn-retry-ws { background: var(--bg); color: var(--text-soft); border: 2px solid var(--border); border-radius: 12px; padding: 14px 28px; font-family: 'Heebo',sans-serif; font-size: 16px; font-weight: 800; cursor: pointer; transition: all 0.2s; }
 .btn-retry-ws:hover { border-color: var(--blue); color: var(--blue); }
 
 @media (max-width: 768px) {
   .q-grid { grid-template-columns: 1fr; }
   .ws-main { padding: 20px 14px 60px; }
+  .ws-header { padding: 20px; }
+  .expr { font-size: 17px; }
 }
 </style>
 </head>
 <body>
 
 <nav class="topnav">
-  <div class="nav-logo">⭐ סטארקווסט</div>
+  <a class="nav-logo" href="app.html">⭐ סטאר<span>קווסט</span></a>
   <div class="nav-links">
     <button class="nav-link" onclick="window.location.href='map.html'">🗺️ מפת שלבים</button>
     <button class="nav-link" onclick="window.location.href='app.html'">🏠 בית</button>
   </div>
   <div class="nav-right">
-    <div class="nav-points" id="nav-points">⭐ 0 נק׳</div>
-    <div class="nav-avatar" id="nav-avatar">?</div>
+    <div class="nav-points" id="nav-points" onclick="window.location.href='app.html#leaderboard'" title="לחץ לדירוג">⭐ 0 נק׳</div>
+    <div class="nav-avatar" id="nav-avatar" onclick="window.location.href='app.html#profile'" title="לחץ לפרופיל">?</div>
   </div>
+  <button class="hamburger" id="hamburger" onclick="toggleDrawer()" aria-label="תפריט">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<div class="mobile-drawer" id="mobile-drawer">
+  <button class="nav-link" onclick="window.location.href='map.html'">🗺️ מפת שלבים</button>
+  <button class="nav-link" onclick="window.location.href='app.html'">🏠 בית</button>
+  <button class="nav-link" onclick="window.location.href='app.html#leaderboard'">🏆 דירוג</button>
+  <button class="nav-link" onclick="window.location.href='app.html#profile'">👤 פרופיל</button>
+</div>
 
 <div class="ws-main">
   <div class="ws-header fadein">
@@ -186,134 +157,20 @@
 
 <script src="sq-core.js"></script>
 <script>
-// ══════════════════════════════════════════════════════════
-// TOPICS — add new topics here. Each topic is one object.
-// id, title, chapter, ptsPerQ, sections[]
-// section: { title, subtitle, questions[] }
-// question: { id, type:'num'|'cmp'|'txt', expr[] or left+right, answer, acceptAlso? }
-// ══════════════════════════════════════════════════════════
+// ── Helpers ───────────────────────────────────────────────
+function getInitials(name) {
+  const parts = (name || '').trim().split(/\s+/);
+  if (parts.length >= 2) return parts[0][0] + parts[parts.length - 1][0];
+  return (parts[0] || '?')[0];
+}
 
+function toggleDrawer() {
+  document.getElementById('mobile-drawer').classList.toggle('open');
+  document.getElementById('hamburger').classList.toggle('open');
+}
+
+// ── Topic data ────────────────────────────────────────────
 const TOPICS = {
-
-  // ── נושא 1: כפל ב-10, ב-100 וב-1,000 ────────────────────
-  noshe1: {
-    id: 'noshe1',
-    title: 'כפל ב-10, ב-100 וב-1,000',
-    chapter: 'פרק א׳',
-    ptsPerQ: 5,
-    sections: [
-      {
-        title: 'פתרו את התרגילים.',
-        subtitle: 'כפל ב-100',
-        questions: [
-          { id:'n1q1',  type:'num', expr:['8 × 100 =', '__'],   answer:'800' },
-          { id:'n1q2',  type:'num', expr:['27 × 100 =', '__'],  answer:'2700' },
-          { id:'n1q3',  type:'num', expr:['6 × 100 =', '__'],   answer:'600' },
-          { id:'n1q4',  type:'num', expr:['16 × 100 =', '__'],  answer:'1600' },
-          { id:'n1q5',  type:'num', expr:['72 × 100 =', '__'],  answer:'7200' },
-          { id:'n1q6',  type:'num', expr:['100 × 58 =', '__'],  answer:'5800' },
-          { id:'n1q7',  type:'num', expr:['100 × 226 =', '__'], answer:'22600' },
-          { id:'n1q8',  type:'num', expr:['100 × 591 =', '__'], answer:'59100' },
-        ]
-      },
-      {
-        title: 'פתרו את התרגילים.',
-        subtitle: 'כפל ב-1,000',
-        questions: [
-          { id:'n1q9',  type:'num', expr:['8 × 1,000 =', '__'],     answer:'8000' },
-          { id:'n1q10', type:'num', expr:['27 × 1,000 =', '__'],    answer:'27000' },
-          { id:'n1q11', type:'num', expr:['51 × 1,000 =', '__'],    answer:'51000' },
-          { id:'n1q12', type:'num', expr:['1,000 × 39 =', '__'],    answer:'39000' },
-          { id:'n1q13', type:'num', expr:['1,000 × 226 =', '__'],   answer:'226000' },
-          { id:'n1q14', type:'num', expr:['1,000 × 591 =', '__'],   answer:'591000' },
-        ]
-      },
-      {
-        title: 'פתרו את התרגילים.',
-        subtitle: 'כפל ב-10, ב-100 וב-1,000 — תרגול משולב',
-        questions: [
-          { id:'n1q15', type:'num', expr:['9 × 1,000 =', '__'],    answer:'9000' },
-          { id:'n1q16', type:'num', expr:['100 × 23 =', '__'],     answer:'2300' },
-          { id:'n1q17', type:'num', expr:['40 × 100 =', '__'],     answer:'4000' },
-          { id:'n1q18', type:'num', expr:['10 × 35 =', '__'],      answer:'350' },
-          { id:'n1q19', type:'num', expr:['99 × 10 =', '__'],      answer:'990' },
-          { id:'n1q20', type:'num', expr:['1,000 × 37 =', '__'],   answer:'37000' },
-        ]
-      },
-      {
-        title: 'בלי לחשב, סמנו <, > או =',
-        subtitle: 'השוו בין הביטויים',
-        questions: [
-          { id:'n1q21', type:'cmp', left:'28 × 10 × 10', right:'1,000 × 28', answer:'<' },
-          { id:'n1q22', type:'cmp', left:'10 × 10 × 17', right:'17 × 100',   answer:'=' },
-          { id:'n1q23', type:'cmp', left:'50 × 100',      right:'5 × 10 × 10', answer:'>' },
-          { id:'n1q24', type:'cmp', left:'89 × 100 × 10', right:'1,000 × 99', answer:'<' },
-        ]
-      }
-    ]
-  },
-
-  // ── נושא 2: כפל בעשרות שלמות, במאות שלמות ובאלפים שלמים ──
-  noshe2: {
-    id: 'noshe2',
-    title: 'כפל בעשרות שלמות, במאות שלמות ובאלפים שלמים',
-    chapter: 'פרק א׳',
-    ptsPerQ: 5,
-    sections: [
-      {
-        title: 'פתרו את התרגילים.',
-        subtitle: 'כפל בעשרות שלמות',
-        questions: [
-          { id:'n2q1', type:'num', expr:['9 × 60 =', '__'],   answer:'540' },
-          { id:'n2q2', type:'num', expr:['8 × 40 =', '__'],   answer:'320' },
-          { id:'n2q3', type:'num', expr:['4 × 90 =', '__'],   answer:'360' },
-          { id:'n2q4', type:'num', expr:['12 × 70 =', '__'],  answer:'840' },
-          { id:'n2q5', type:'num', expr:['21 × 50 =', '__'],  answer:'1050' },
-          { id:'n2q6', type:'num', expr:['20 × 7 =', '__'],   answer:'140' },
-          { id:'n2q7', type:'num', expr:['30 × 13 =', '__'],  answer:'390' },
-        ]
-      },
-      {
-        title: 'פתרו את התרגילים.',
-        subtitle: 'כפל במאות שלמות ובאלפים שלמים',
-        questions: [
-          { id:'n2q8',  type:'num', expr:['4 × 800 =', '__'],   answer:'3200' },
-          { id:'n2q9',  type:'num', expr:['9 × 600 =', '__'],   answer:'5400' },
-          { id:'n2q10', type:'num', expr:['5 × 900 =', '__'],   answer:'4500' },
-          { id:'n2q11', type:'num', expr:['7 × 700 =', '__'],   answer:'4900' },
-          { id:'n2q12', type:'num', expr:['18 × 200 =', '__'],  answer:'3600' },
-          { id:'n2q13', type:'num', expr:['16 × 500 =', '__'],  answer:'8000' },
-          { id:'n2q14', type:'num', expr:['200 × 6 =', '__'],   answer:'1200' },
-          { id:'n2q15', type:'num', expr:['300 × 3 =', '__'],   answer:'900' },
-        ]
-      },
-      {
-        title: 'פתרו את התרגילים.',
-        subtitle: 'כפל של עשרות בעשרות ובמאות',
-        questions: [
-          { id:'n2q16', type:'num', expr:['50 × 70 =', '__'],   answer:'3500' },
-          { id:'n2q17', type:'num', expr:['60 × 60 =', '__'],   answer:'3600' },
-          { id:'n2q18', type:'num', expr:['30 × 40 =', '__'],   answer:'1200' },
-          { id:'n2q19', type:'num', expr:['90 × 80 =', '__'],   answer:'7200' },
-          { id:'n2q20', type:'num', expr:['20 × 300 =', '__'],  answer:'6000' },
-          { id:'n2q21', type:'num', expr:['30 × 400 =', '__'],  answer:'12000' },
-        ]
-      },
-      {
-        title: 'בלי לחשב, סמנו <, > או =',
-        subtitle: 'השוו בין הביטויים',
-        questions: [
-          { id:'n2q22', type:'cmp', left:'100 × 78',      right:'780 × 10',     answer:'=' },
-          { id:'n2q23', type:'cmp', left:'590 × 10 × 1',  right:'59 × 10 × 10', answer:'=' },
-          { id:'n2q24', type:'cmp', left:'80 × 90 × 1',   right:'8 × 10 × 900', answer:'<' },
-          { id:'n2q25', type:'cmp', left:'60 × 30',        right:'18 × 100',     answer:'=' },
-          { id:'n2q26', type:'cmp', left:'70 × 50',        right:'35 × 1,000',   answer:'<' },
-        ]
-      }
-    ]
-  },
-
-  // ── נושא 7: תכונות ה-0 וה-1 ──────────────────────────────
   noshe7: {
     id:      'noshe7',
     title:   'תכונות ה-0 וה-1',
@@ -372,14 +229,14 @@ const TOPICS = {
       }
     ]
   }
-
-  // ── Add Topics 3–6 here when ready ───────────────────────
+  // Add more topics here:
+  // noshe1: { ... }, noshe2: { ... }, etc.
 };
 
 // ── State ─────────────────────────────────────────────────
 const session = requireAuth();
 const params  = new URLSearchParams(window.location.search);
-const topicId = params.get('topic') || 'noshe1';
+const topicId = params.get('topic') || 'noshe7';
 const topic   = TOPICS[topicId];
 let wsSubmitted = false;
 let allQuestions = [];
@@ -450,8 +307,7 @@ function buildWorksheet() {
   });
 
   document.getElementById('ws-questions').innerHTML = html;
-  const total = allQuestions.length;
-  document.getElementById('ws-progress-count').textContent = `0 / ${total}`;
+  document.getElementById('ws-progress-count').textContent = `0 / ${allQuestions.length}`;
 
   allQuestions.forEach(q => {
     const el = document.getElementById('inp-' + q.id);
@@ -465,8 +321,7 @@ function updateProgress() {
     return el && el.value.trim() !== '';
   }).length;
   const total = allQuestions.length;
-  const pct = Math.round((filled / total) * 100);
-  document.getElementById('ws-progress-fill').style.width = pct + '%';
+  document.getElementById('ws-progress-fill').style.width = Math.round((filled / total) * 100) + '%';
   document.getElementById('ws-progress-count').textContent = `${filled} / ${total}`;
 }
 
@@ -481,7 +336,6 @@ function checkAnswer(q) {
   return user === correct;
 }
 
-// ── Submit ────────────────────────────────────────────────
 async function wsSubmit() {
   if (wsSubmitted) return;
   wsSubmitted = true;
@@ -568,7 +422,7 @@ function wsRetry() {
 }
 
 // ── Init ──────────────────────────────────────────────────
-document.getElementById('nav-avatar').textContent = session.name[0];
+document.getElementById('nav-avatar').textContent = getInitials(session.name);
 document.getElementById('nav-points').textContent = '⭐ ' + (session.points || 0) + ' נק׳';
 buildWorksheet();
 </script>
